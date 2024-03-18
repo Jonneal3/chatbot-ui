@@ -1,7 +1,7 @@
 import { ContentType } from "@/types"
 import { FC } from "react"
-import { TabsTrigger } from "../ui/tabs"
-import { WithTooltip } from "../ui/with-tooltip"
+import { TabsTrigger } from "../../ui/tabs"
+import { WithTooltip } from "../../ui/with-tooltip"
 
 interface SidebarSwitchItemProps {
   contentType: ContentType
@@ -21,7 +21,7 @@ export const SidebarSwitchItem: FC<SidebarSwitchItemProps> = ({
       }
       trigger={
         <TabsTrigger
-          className="hover:opacity-50"
+          className="hover:bg-accent rounded hover:bg-opacity-50"
           value={contentType}
           onClick={() => onContentTypeChange(contentType as ContentType)}
         >

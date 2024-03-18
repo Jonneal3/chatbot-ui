@@ -6,32 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
+export type Database = {
   public: {
     Tables: {
       assistant_collections: {
@@ -47,7 +22,7 @@ export interface Database {
           collection_id: string
           created_at?: string
           updated_at?: string | null
-          user_id: string
+          user_id: string | null
         }
         Update: {
           assistant_id?: string
@@ -93,14 +68,14 @@ export interface Database {
           created_at?: string
           file_id: string
           updated_at?: string | null
-          user_id: string
+          user_id: string | null
         }
         Update: {
           assistant_id?: string
           created_at?: string
           file_id?: string
           updated_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -139,7 +114,7 @@ export interface Database {
           created_at?: string
           tool_id: string
           updated_at?: string | null
-          user_id: string
+          user_id: string | null
         }
         Update: {
           assistant_id?: string
@@ -346,6 +321,7 @@ export interface Database {
           id: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
+          metadata: Json | null
           model: string
           name: string
           prompt: string
@@ -364,6 +340,7 @@ export interface Database {
           id?: string
           include_profile_context: boolean
           include_workspace_instructions: boolean
+          metadata?: Json | null
           model: string
           name: string
           prompt: string
@@ -382,6 +359,7 @@ export interface Database {
           id?: string
           include_profile_context?: boolean
           include_workspace_instructions?: boolean
+          metadata?: Json | null
           model?: string
           name?: string
           prompt?: string
@@ -427,22 +405,22 @@ export interface Database {
           collection_id: string
           created_at: string
           file_id: string
-          updated_at: string | null
-          user_id: string
+          updated_at: string
+          user_id: string | null
         }
         Insert: {
           collection_id: string
           created_at?: string
           file_id: string
-          updated_at?: string | null
-          user_id: string
+          updated_at?: string
+          user_id: string | null
         }
         Update: {
           collection_id?: string
           created_at?: string
           file_id?: string
-          updated_at?: string | null
-          user_id?: string
+          updated_at?: string 
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -562,13 +540,130 @@ export interface Database {
           }
         ]
       }
+      connection_workspaces: {
+        Row: {
+          connection_id: string
+          created_at: string
+          user_id: string | null
+          workspace_id: string
+        }
+        Insert: {
+          connection_id: string
+          created_at?: string
+          user_id?: string | null
+          workspace_id: string
+        }
+        Update: {
+          connection_id?: string
+          created_at?: string
+          user_id?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_connection_workspaces_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "connections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_connection_workspaces_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_connection_workspaces_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      connections: {
+        Row: {
+          created_at: string
+          folder_id: string | null
+          id: string
+          integration_id: string
+          metadata: Json | null
+          name: string 
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          folder_id?: string | null
+          id?: string
+          integration_id?: string
+          metadata?: Json | null
+          name?: string 
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          folder_id?: string | null
+          id?: string
+          integration_id?: string
+          metadata?: Json | null
+          name?: string 
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auth_connections_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_auth_connections_auth_integration_unique_key_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "integrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_connections_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      customers: {
+        Row: {
+          id: string
+          stripe_customer_id: string | null
+        }
+        Insert: {
+          id: string
+          stripe_customer_id?: string | null
+        }
+        Update: {
+          id?: string
+          stripe_customer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       file_items: {
         Row: {
           content: string
           created_at: string
           file_id: string
           id: string
-          level: number | null
           local_embedding: string | null
           openai_embedding: string | null
           sharing: string
@@ -581,7 +676,6 @@ export interface Database {
           created_at?: string
           file_id: string
           id?: string
-          level?: number | null
           local_embedding?: string | null
           openai_embedding?: string | null
           sharing?: string
@@ -594,7 +688,6 @@ export interface Database {
           created_at?: string
           file_id?: string
           id?: string
-          level?: number | null
           local_embedding?: string | null
           openai_embedding?: string | null
           sharing?: string
@@ -725,36 +818,6 @@ export interface Database {
           }
         ]
       }
-      files_raptor: {
-        Row: {
-          child_chunk_id: string
-          parent_chunk_id: string
-        }
-        Insert: {
-          child_chunk_id: string
-          parent_chunk_id: string
-        }
-        Update: {
-          child_chunk_id?: string
-          parent_chunk_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "files_raptor_child_chunk_id_fkey"
-            columns: ["child_chunk_id"]
-            isOneToOne: false
-            referencedRelation: "file_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "files_raptor_parent_chunk_id_fkey"
-            columns: ["parent_chunk_id"]
-            isOneToOne: false
-            referencedRelation: "file_items"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       folders: {
         Row: {
           created_at: string
@@ -802,6 +865,57 @@ export interface Database {
             referencedColumns: ["id"]
           }
         ]
+      }
+      integrations: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          description: string | null
+          id: string
+          image: string
+          name: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          description?: string
+          id: string
+          image?: string | null
+          name: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      logs: {
+        Row: {
+          created_at: string
+          id: number
+          log: Json | null
+          name: string | null
+          uuid: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          log?: Json | null
+          name?: string | null
+          uuid?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          log?: Json | null
+          name?: string | null
+          uuid?: string | null
+        }
+        Relationships: []
       }
       message_file_items: {
         Row: {
@@ -857,9 +971,11 @@ export interface Database {
           created_at: string
           id: string
           image_paths: string[]
+          metadata: Json | null
           model: string
           role: string
           sequence_number: number
+          source: string | null
           updated_at: string | null
           user_id: string
         }
@@ -870,9 +986,11 @@ export interface Database {
           created_at?: string
           id?: string
           image_paths: string[]
+          metadata?: Json | null
           model: string
           role: string
           sequence_number: number
+          source?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -883,20 +1001,15 @@ export interface Database {
           created_at?: string
           id?: string
           image_paths?: string[]
+          metadata?: Json | null
           model?: string
           role?: string
           sequence_number?: number
+          source?: string | null
           updated_at?: string | null
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "messages_assistant_id_fkey"
-            columns: ["assistant_id"]
-            isOneToOne: false
-            referencedRelation: "assistants"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "messages_chat_id_fkey"
             columns: ["chat_id"]
@@ -909,6 +1022,13 @@ export interface Database {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_messages_assistant_id_fkey"
+            columns: ["assistant_id"]
+            isOneToOne: false
+            referencedRelation: "assistants"
             referencedColumns: ["id"]
           }
         ]
@@ -977,7 +1097,7 @@ export interface Database {
         Insert: {
           api_key: string
           base_url: string
-          context_length?: number
+          context_length: number
           created_at?: string
           description: string
           folder_id?: string | null
@@ -991,7 +1111,7 @@ export interface Database {
         Update: {
           api_key?: string
           base_url?: string
-          context_length?: number
+          context_length: number
           created_at?: string
           description?: string
           folder_id?: string | null
@@ -1134,6 +1254,83 @@ export interface Database {
           }
         ]
       }
+      prices: {
+        Row: {
+          active: boolean | null
+          currency: string | null
+          description: string | null
+          id: string
+          interval: Database["public"]["Enums"]["pricing_plan_interval"] | null
+          interval_count: number | null
+          metadata: Json | null
+          product_id: string | null
+          trial_period_days: number | null
+          type: Database["public"]["Enums"]["pricing_type"] | null
+          unit_amount: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          currency?: string | null
+          description?: string | null
+          id: string
+          interval?: Database["public"]["Enums"]["pricing_plan_interval"] | null
+          interval_count?: number | null
+          metadata?: Json | null
+          product_id?: string | null
+          trial_period_days?: number | null
+          type?: Database["public"]["Enums"]["pricing_type"] | null
+          unit_amount?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          currency?: string | null
+          description?: string | null
+          id?: string
+          interval?: Database["public"]["Enums"]["pricing_plan_interval"] | null
+          interval_count?: number | null
+          metadata?: Json | null
+          product_id?: string | null
+          trial_period_days?: number | null
+          type?: Database["public"]["Enums"]["pricing_type"] | null
+          unit_amount?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prices_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      products: {
+        Row: {
+          active: boolean | null
+          description: string | null
+          id: string
+          image: string | null
+          metadata: Json | null
+          name: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          description?: string | null
+          id: string
+          image?: string | null
+          metadata?: Json | null
+          name?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          description?: string | null
+          id?: string
+          image?: string | null
+          metadata?: Json | null
+          name?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           anthropic_api_key: string | null
@@ -1143,11 +1340,11 @@ export interface Database {
           azure_openai_api_key: string | null
           azure_openai_embeddings_id: string | null
           azure_openai_endpoint: string | null
+          groq_api_key: string | null
           bio: string
           created_at: string
           display_name: string
           google_gemini_api_key: string | null
-          groq_api_key: string | null
           has_onboarded: boolean
           id: string
           image_path: string
@@ -1171,11 +1368,11 @@ export interface Database {
           azure_openai_api_key?: string | null
           azure_openai_embeddings_id?: string | null
           azure_openai_endpoint?: string | null
+          groq_api_key: string | null
           bio: string
           created_at?: string
           display_name: string
           google_gemini_api_key?: string | null
-          groq_api_key?: string | null
           has_onboarded?: boolean
           id?: string
           image_path: string
@@ -1199,11 +1396,11 @@ export interface Database {
           azure_openai_api_key?: string | null
           azure_openai_embeddings_id?: string | null
           azure_openai_endpoint?: string | null
+          groq_api_key: string | null
           bio?: string
           created_at?: string
           display_name?: string
           google_gemini_api_key?: string | null
-          groq_api_key?: string | null
           has_onboarded?: boolean
           id?: string
           image_path?: string
@@ -1323,6 +1520,124 @@ export interface Database {
           }
         ]
       }
+      runs: {
+        Row: {
+          assistant_id: string | null
+          chat_id: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          assistant_id?: string | null
+          chat_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          assistant_id?: string | null
+          chat_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_runs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "runs_assistant_id_fkey"
+            columns: ["assistant_id"]
+            isOneToOne: false
+            referencedRelation: "assistants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "runs_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "chats"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      subscriptions: {
+        Row: {
+          cancel_at: string | null
+          cancel_at_period_end: boolean | null
+          canceled_at: string | null
+          created: string
+          current_period_end: string
+          current_period_start: string
+          ended_at: string | null
+          id: string
+          metadata: Json | null
+          price_id: string | null
+          quantity: number | null
+          status: Database["public"]["Enums"]["subscription_status"] | null
+          trial_end: string | null
+          trial_start: string | null
+          user_id: string
+        }
+        Insert: {
+          cancel_at?: string | null
+          cancel_at_period_end?: boolean | null
+          canceled_at?: string | null
+          created?: string
+          current_period_end?: string
+          current_period_start?: string
+          ended_at?: string | null
+          id: string
+          metadata?: Json | null
+          price_id?: string | null
+          quantity?: number | null
+          status?: Database["public"]["Enums"]["subscription_status"] | null
+          trial_end?: string | null
+          trial_start?: string | null
+          user_id: string
+        }
+        Update: {
+          cancel_at?: string | null
+          cancel_at_period_end?: boolean | null
+          canceled_at?: string | null
+          created?: string
+          current_period_end?: string
+          current_period_start?: string
+          ended_at?: string | null
+          id?: string
+          metadata?: Json | null
+          price_id?: string | null
+          quantity?: number | null
+          status?: Database["public"]["Enums"]["subscription_status"] | null
+          trial_end?: string | null
+          trial_start?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_price_id_fkey"
+            columns: ["price_id"]
+            isOneToOne: false
+            referencedRelation: "prices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       tool_workspaces: {
         Row: {
           created_at: string
@@ -1371,45 +1686,61 @@ export interface Database {
       }
       tools: {
         Row: {
+          connection_id: string
           created_at: string
           custom_headers: Json
           description: string
           folder_id: string | null
           id: string
           name: string
+          post_process: Json | null
+          request_in_body: boolean
           schema: Json
           sharing: string
           updated_at: string | null
-          url: string
+          url: string | null
           user_id: string
         }
         Insert: {
+          connection_id?: string
           created_at?: string
           custom_headers?: Json
           description: string
           folder_id?: string | null
           id?: string
           name: string
+          post_process?: Json | null
+          request_in_body?: boolean
           schema?: Json
           sharing?: string
           updated_at?: string | null
-          url: string
+          url?: string | null
           user_id: string
         }
         Update: {
+          connection_id?: string
           created_at?: string
           custom_headers?: Json
           description?: string
           folder_id?: string | null
           id?: string
           name?: string
+          post_process?: Json | null
+          request_in_body?: boolean
           schema?: Json
           sharing?: string
           updated_at?: string | null
-          url?: string
+          url?: string | null
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "public_tools_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "connections"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tools_folder_id_fkey"
             columns: ["folder_id"]
@@ -1421,6 +1752,38 @@ export interface Database {
             foreignKeyName: "tools_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      users: {
+        Row: {
+          avatar_url: string | null
+          billing_address: Json | null
+          full_name: string | null
+          id: string
+          payment_method: Json | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          billing_address?: Json | null
+          full_name?: string | null
+          id: string
+          payment_method?: Json | null
+        }
+        Update: {
+          avatar_url?: string | null
+          billing_address?: Json | null
+          full_name?: string | null
+          id?: string
+          payment_method?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           }
@@ -1585,186 +1948,17 @@ export interface Database {
       }
     }
     Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
-  storage: {
-    Tables: {
-      buckets: {
-        Row: {
-          allowed_mime_types: string[] | null
-          avif_autodetection: boolean | null
-          created_at: string | null
-          file_size_limit: number | null
-          id: string
-          name: string
-          owner: string | null
-          owner_id: string | null
-          public: boolean | null
-          updated_at: string | null
-        }
-        Insert: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id: string
-          name: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          updated_at?: string | null
-        }
-        Update: {
-          allowed_mime_types?: string[] | null
-          avif_autodetection?: boolean | null
-          created_at?: string | null
-          file_size_limit?: number | null
-          id?: string
-          name?: string
-          owner?: string | null
-          owner_id?: string | null
-          public?: boolean | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      migrations: {
-        Row: {
-          executed_at: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Insert: {
-          executed_at?: string | null
-          hash: string
-          id: number
-          name: string
-        }
-        Update: {
-          executed_at?: string | null
-          hash?: string
-          id?: number
-          name?: string
-        }
-        Relationships: []
-      }
-      objects: {
-        Row: {
-          bucket_id: string | null
-          created_at: string | null
-          id: string
-          last_accessed_at: string | null
-          metadata: Json | null
-          name: string | null
-          owner: string | null
-          owner_id: string | null
-          path_tokens: string[] | null
-          updated_at: string | null
-          version: string | null
-        }
-        Insert: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          version?: string | null
-        }
-        Update: {
-          bucket_id?: string | null
-          created_at?: string | null
-          id?: string
-          last_accessed_at?: string | null
-          metadata?: Json | null
-          name?: string | null
-          owner?: string | null
-          owner_id?: string | null
-          path_tokens?: string[] | null
-          updated_at?: string | null
-          version?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "objects_bucketId_fkey"
-            columns: ["bucket_id"]
-            isOneToOne: false
-            referencedRelation: "buckets"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      can_insert_object: {
-        Args: {
-          bucketid: string
-          name: string
-          owner: string
-          metadata: Json
-        }
-        Returns: undefined
-      }
-      extension: {
-        Args: {
-          name: string
-        }
-        Returns: string
-      }
-      filename: {
-        Args: {
-          name: string
-        }
-        Returns: string
-      }
-      foldername: {
-        Args: {
-          name: string
-        }
-        Returns: unknown
-      }
-      get_size_by_bucket: {
-        Args: Record<PropertyKey, never>
-        Returns: {
-          size: number
-          bucket_id: string
-        }[]
-      }
-      search: {
-        Args: {
-          prefix: string
-          bucketname: string
-          limits?: number
-          levels?: number
-          offsets?: number
-          search?: string
-          sortcolumn?: string
-          sortorder?: string
-        }
-        Returns: {
-          name: string
-          id: string
-          updated_at: string
-          created_at: string
-          last_accessed_at: string
-          metadata: Json
-        }[]
-      }
-    }
-    Enums: {
-      [_ in never]: never
+      pricing_plan_interval: "day" | "week" | "month" | "year"
+      pricing_type: "one_time" | "recurring"
+      subscription_status:
+        | "trialing"
+        | "active"
+        | "canceled"
+        | "incomplete"
+        | "incomplete_expired"
+        | "past_due"
+        | "unpaid"
+        | "paused"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1851,4 +2045,3 @@ export type Enums<
   : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
   ? Database["public"]["Enums"][PublicEnumNameOrOptions]
   : never
-

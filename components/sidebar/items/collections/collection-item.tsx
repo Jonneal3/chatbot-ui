@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label"
 import { COLLECTION_DESCRIPTION_MAX, COLLECTION_NAME_MAX } from "@/db/limits"
 import { Tables } from "@/supabase/types"
 import { CollectionFile } from "@/types"
-import { IconBooks } from "@tabler/icons-react"
+import { IconFolders } from "@tabler/icons-react"
 import { FC, useState } from "react"
 import { SidebarItem } from "../all/sidebar-display-item"
 import { CollectionFileSelect } from "./collection-file-select"
@@ -41,7 +41,7 @@ export const CollectionItem: FC<CollectionItemProps> = ({ collection }) => {
       item={collection}
       isTyping={isTyping}
       contentType="collections"
-      icon={<IconBooks size={30} />}
+      icon={<IconFolders size={30} />}
       updateState={{
         name,
         description

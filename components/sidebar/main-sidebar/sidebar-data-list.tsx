@@ -7,20 +7,23 @@ import { updateModel } from "@/db/models"
 import { updatePreset } from "@/db/presets"
 import { updatePrompt } from "@/db/prompts"
 import { updateTool } from "@/db/tools"
+import { updateConnection } from "@/db/connections"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
 import { ContentType, DataItemType, DataListType } from "@/types"
 import { FC, useContext, useEffect, useRef, useState } from "react"
-import { Separator } from "../ui/separator"
-import { AssistantItem } from "./items/assistants/assistant-item"
-import { ChatItem } from "./items/chat/chat-item"
-import { CollectionItem } from "./items/collections/collection-item"
-import { FileItem } from "./items/files/file-item"
-import { Folder } from "./items/folders/folder-item"
-import { ModelItem } from "./items/models/model-item"
-import { PresetItem } from "./items/presets/preset-item"
-import { PromptItem } from "./items/prompts/prompt-item"
-import { ToolItem } from "./items/tools/tool-item"
+import { Separator } from "../../ui/separator"
+import { AssistantItem } from "../items/assistants/assistant-item"
+import { ChatItem } from "../items/chat/chat-item"
+import { CollectionItem } from "../items/collections/collection-item"
+import { FileItem } from "../items/files/file-item"
+import { Folder } from "../items/folders/folder-item"
+import { ModelItem } from "../items/models/model-item"
+import { PresetItem } from "../items/presets/preset-item"
+import { PromptItem } from "../items/prompts/prompt-item"
+import { ToolItem } from "../items/tools/tool-item"
+import { ConnectionItem } from "../items/connections/connection-item"
+import { IconAlertCircle } from "@tabler/icons-react"
 
 interface SidebarDataListProps {
   contentType: ContentType
@@ -41,7 +44,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     setCollections,
     setAssistants,
     setTools,
-    setModels
+    setModels,
+    setConnections
   } = useContext(ChatbotUIContext)
 
   const divRef = useRef<HTMLDivElement>(null)
@@ -84,6 +88,14 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
       case "tools":
         return <ToolItem key={item.id} tool={item as Tables<"tools">} />
+
+      case "connections":
+        return (
+          <ConnectionItem
+            key={item.id}
+            connection={item as Tables<"connections">}
+          />
+        )
 
       case "models":
         return <ModelItem key={item.id} model={item as Tables<"models">} />
@@ -140,7 +152,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     collections: updateCollection,
     assistants: updateAssistant,
     tools: updateTool,
-    models: updateModel
+    models: updateModel,
+    connections: updateConnection
   }
 
   const stateUpdateFunctions = {
@@ -151,11 +164,12 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     collections: setCollections,
     assistants: setAssistants,
     tools: setTools,
-    models: setModels
+    models: setModels,
+    connections: setConnections
   }
 
   const updateFolder = async (itemId: string, folderId: string | null) => {
-    const item: any = data.find(item => item.id === itemId)
+    const item: any = data.find((item: { id: string }) => item.id === itemId)
 
     if (!item) return null
 
@@ -165,7 +179,13 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     if (!updateFunction || !setStateFunction) return
 
     const updatedItem = await updateFunction(item.id, {
-      folder_id: folderId
+      id: item.id,
+      name: item.name, // replace with the actual property name
+      integration_id: item.integration_id, // replace with the actual property name
+      user_id: item.user_id, // replace with the actual property name
+      metadata: item.metadata, // replace with the actual property name
+      folder_id: folderId !== null ? folderId : undefined, // Ensure folderId is not null
+      context_length: item.context_length // Replace 10 with the actual value you want for context_length
     })
 
     setStateFunction((items: any) =>
@@ -214,8 +234,16 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     }
   }, [data])
 
-  const dataWithFolders = data.filter(item => item.folder_id)
-  const dataWithoutFolders = data.filter(item => item.folder_id === null)
+  const dataArray = Array.isArray(data) ? data : [data]
+  const dataWithFolders = dataArray.filter(
+    (item: any) => item.folder_id !== undefined && item.folder_id !== null
+  )
+  const dataWithoutFolders = dataArray.filter(
+    (item: any) => item.folder_id === undefined || item.folder_id === null
+  )
+
+  console.log("content type", contentType)
+  console.log("data", data)
 
   return (
     <>
@@ -226,7 +254,12 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
       >
         {data.length === 0 && (
           <div className="flex grow flex-col items-center justify-center">
-            <div className=" text-centertext-muted-foreground p-8 text-lg italic">
+            <div className="text-neutral-content/30 text-12px p-8 text-center">
+              <div className="flex items-center justify-center">
+                {" "}
+                {/* Container for centering */}
+                <IconAlertCircle /> {/* Icon */}
+              </div>
               No {contentType}.
             </div>
           </div>
@@ -246,8 +279,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                 contentType={contentType}
               >
                 {dataWithFolders
-                  .filter(item => item.folder_id === folder.id)
-                  .map(item => (
+                  .filter((item: any) => item.folder_id === folder.id)
+                  .map((item: DataItemType) => (
                     <div
                       key={item.id}
                       draggable
@@ -315,7 +348,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
                 onDragLeave={handleDragLeave}
                 onDragOver={handleDragOver}
               >
-                {dataWithoutFolders.map(item => {
+                {dataWithoutFolders.map((item: DataItemType) => {
                   return (
                     <div
                       key={item.id}

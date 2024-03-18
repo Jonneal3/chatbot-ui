@@ -2,6 +2,7 @@ import { Brand } from "@/components/ui/brand"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SubmitButton } from "@/components/ui/submit-button"
+import { getSubscriptionsByUserId } from "@/db/subscriptions"
 import { createClient } from "@/lib/supabase/server"
 import { Database } from "@/supabase/types"
 import { createServerClient } from "@supabase/ssr"
@@ -34,18 +35,36 @@ export default async function Login({
   const session = (await supabase.auth.getSession()).data.session
 
   if (session) {
-    const { data: homeWorkspace, error } = await supabase
-      .from("workspaces")
-      .select("*")
-      .eq("user_id", session.user.id)
-      .eq("is_home", true)
-      .single()
+    let redirectPath = "/pricing" // Default redirect path
 
-    if (!homeWorkspace) {
-      throw new Error(error.message)
+    try {
+      const subscription = await getSubscriptionsByUserId(session.user.id)
+      const { data: homeWorkspace, error: homeWorkspaceError } = await supabase
+        .from("workspaces")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .eq("is_home", true)
+        .single()
+
+      if (
+        subscription.status === "trialing" ||
+        subscription.status === "active"
+      ) {
+        if (homeWorkspace) {
+          redirectPath = `/${homeWorkspace.id}/chat` // Update redirect path if home workspace is found
+        } else {
+          throw new Error(
+            homeWorkspaceError?.message || "Home workspace not found"
+          )
+        }
+      } else {
+        redirectPath = "/accounts" // Update redirect path if subscription is not active or in trial
+      }
+    } catch (error) {
+      console.error("Error:", error)
     }
 
-    return redirect(`/${homeWorkspace.id}/chat`)
+    return redirect(redirectPath) // Redirect the user based on the determined path
   }
 
   const signIn = async (formData: FormData) => {
@@ -64,21 +83,37 @@ export default async function Login({
     if (error) {
       return redirect(`/login?message=${error.message}`)
     }
+    {
+      let redirectPath = "/pricing" // Default redirect path
+      try {
+        const subscription = await getSubscriptionsByUserId(data.user.id)
+        const { data: homeWorkspace, error: homeWorkspaceError } =
+          await supabase
+            .from("workspaces")
+            .select("*")
+            .eq("user_id", data.user.id)
+            .eq("is_home", true)
+            .single()
 
-    const { data: homeWorkspace, error: homeWorkspaceError } = await supabase
-      .from("workspaces")
-      .select("*")
-      .eq("user_id", data.user.id)
-      .eq("is_home", true)
-      .single()
-
-    if (!homeWorkspace) {
-      throw new Error(
-        homeWorkspaceError?.message || "An unexpected error occurred"
-      )
+        if (
+          subscription.status === "trialing" ||
+          subscription.status === "active"
+        ) {
+          if (homeWorkspace) {
+            redirectPath = `/${homeWorkspace.id}/chat` // Update redirect path if home workspace is found
+          } else {
+            throw new Error(
+              homeWorkspaceError?.message || "Home workspace not found"
+            )
+          }
+        } else {
+          redirectPath = "/accounts" // Update redirect path if subscription is not active or in trial
+        }
+      } catch (error) {
+        console.error("Error:", error)
+      }
+      return redirect(redirectPath) // Redirect the user based on the determined path
     }
-
-    return redirect(`/${homeWorkspace.id}/chat`)
   }
 
   const getEnvVarOrEdgeConfigValue = async (name: string) => {

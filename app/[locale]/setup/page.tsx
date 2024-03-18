@@ -14,13 +14,13 @@ import { supabase } from "@/lib/supabase/browser-client"
 import { TablesUpdate } from "@/supabase/types"
 import { useRouter } from "next/navigation"
 import { useContext, useEffect, useState } from "react"
-import { APIStep } from "../../../components/setup/api-step"
-import { FinishStep } from "../../../components/setup/finish-step"
-import { ProfileStep } from "../../../components/setup/profile-step"
+import { APIStep } from "@/components/setup/api-step"
+import { FinishStep } from "@/components/setup/finish-step"
+import { ProfileStep } from "@/components/setup/profile-step"
 import {
   SETUP_STEP_COUNT,
   StepContainer
-} from "../../../components/setup/step-container"
+} from "@/components/setup/step-container"
 
 export default function SetupPage() {
   const {
@@ -97,7 +97,13 @@ export default function SetupPage() {
         }
       }
     })()
-  }, [])
+  }, [
+    router,
+    setAvailableHostedModels,
+    setAvailableOpenRouterModels,
+    setEnvKeyMap,
+    setProfile
+  ])
 
   const handleShouldProceed = (proceed: boolean) => {
     if (proceed) {

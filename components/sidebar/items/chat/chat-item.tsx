@@ -57,8 +57,8 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     <div
       ref={itemRef}
       className={cn(
-        "hover:bg-accent focus:bg-accent group flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none",
-        isActive && "bg-accent"
+        "hover:bg-secondary hover:text-primary-content focus:bg-secondary group flex w-full cursor-pointer items-center rounded p-2 hover:bg-opacity-70 focus:outline-none",
+        isActive && "bg-primary text-primary-content"
       )}
       tabIndex={0}
       onKeyDown={handleKeyDown}
@@ -68,7 +68,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
         assistantImage ? (
           <Image
             style={{ width: "30px", height: "30px" }}
-            className="rounded"
+            className="rounded-full"
             src={assistantImage}
             alt="Assistant image"
             width={30}
@@ -76,7 +76,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           />
         ) : (
           <IconRobotFace
-            className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+            className="bg-secondary text-secondary-content rounded-full border-DEFAULT border-none p-1"
             size={30}
           />
         )

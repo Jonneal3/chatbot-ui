@@ -91,7 +91,8 @@ export const createTempMessages = (
   let tempUserChatMessage: ChatMessage = {
     message: {
       chat_id: "",
-      assistant_id: null,
+      metadata: "",
+      source: "ui",
       content: messageContent,
       created_at: "",
       id: uuidv4(),
@@ -100,7 +101,8 @@ export const createTempMessages = (
       role: "user",
       sequence_number: chatMessages.length,
       updated_at: "",
-      user_id: ""
+      user_id: "",
+      assistant_id: null
     },
     fileItems: []
   }
@@ -108,6 +110,8 @@ export const createTempMessages = (
   let tempAssistantChatMessage: ChatMessage = {
     message: {
       chat_id: "",
+      metadata: "",
+      source: "ui",
       assistant_id: selectedAssistant?.id || null,
       content: "",
       created_at: "",
@@ -407,6 +411,8 @@ export const handleCreateMessages = async (
   const finalUserMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
     assistant_id: null,
+    metadata: "",
+    source: "ui",
     user_id: profile.user_id,
     content: messageContent,
     model: modelData.modelId,
@@ -418,6 +424,8 @@ export const handleCreateMessages = async (
   const finalAssistantMessage: TablesInsert<"messages"> = {
     chat_id: currentChat.id,
     assistant_id: selectedAssistant?.id || null,
+    metadata: "",
+    source: "ui",
     user_id: profile.user_id,
     content: generatedText,
     model: modelData.modelId,

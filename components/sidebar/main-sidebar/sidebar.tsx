@@ -2,10 +2,10 @@ import { ChatbotUIContext } from "@/context/context"
 import { Tables } from "@/supabase/types"
 import { ContentType } from "@/types"
 import { FC, useContext } from "react"
-import { SIDEBAR_WIDTH } from "../ui/dashboard"
-import { TabsContent } from "../ui/tabs"
-import { WorkspaceSwitcher } from "../utility/workspace-switcher"
-import { WorkspaceSettings } from "../workspace/workspace-settings"
+import { SIDEBAR_WIDTH } from "../../ui/dashboard"
+import { TabsContent } from "../../ui/tabs"
+import { WorkspaceSwitcher } from "../../utility/workspace-switcher"
+import { WorkspaceSettings } from "../../workspace/workspace-settings"
 import { SidebarContent } from "./sidebar-content"
 
 interface SidebarProps {
@@ -23,7 +23,8 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
     collections,
     assistants,
     tools,
-    models
+    models,
+    connections
   } = useContext(ChatbotUIContext)
 
   const chatFolders = folders.filter(folder => folder.type === "chats")
@@ -38,6 +39,9 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
   )
   const toolFolders = folders.filter(folder => folder.type === "tools")
   const modelFolders = folders.filter(folder => folder.type === "models")
+  const connectionFolders = folders.filter(
+    folder => folder.type === "connections"
+  )
 
   const renderSidebarContent = (
     contentType: ContentType,
@@ -60,8 +64,8 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
       }}
       value={contentType}
     >
-      <div className="flex h-full flex-col p-3">
-        <div className="flex items-center border-b-2 pb-2">
+      <div className="bg-base-300 flex h-full flex-col p-3">
+        <div className="flex items-center border-b pb-2">
           <WorkspaceSwitcher />
 
           <WorkspaceSettings />
@@ -100,6 +104,13 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
 
             case "models":
               return renderSidebarContent("models", models, modelFolders)
+
+            case "connections":
+              return renderSidebarContent(
+                "connections",
+                connections,
+                connectionFolders
+              )
 
             default:
               return null

@@ -10,7 +10,7 @@ import {
   IconCaretRightFilled,
   IconCircleFilled,
   IconFileText,
-  IconMoodSmile,
+  IconUserCircle,
   IconPencil
 } from "@tabler/icons-react"
 import Image from "next/image"
@@ -24,7 +24,7 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { MessageActions } from "./message-actions"
 import { MessageMarkdown } from "./message-markdown"
 
-const ICON_SIZE = 32
+const ICON_SIZE = 26
 
 interface MessageProps {
   message: Tables<"messages">
@@ -181,10 +181,7 @@ export const Message: FC<MessageProps> = ({
 
   return (
     <div
-      className={cn(
-        "flex w-full justify-center",
-        message.role === "user" ? "" : "bg-secondary"
-      )}
+      className={cn("bg-base flex w-full justify-center")}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       onKeyDown={handleKeyDown}
@@ -205,14 +202,14 @@ export const Message: FC<MessageProps> = ({
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
               <IconPencil
-                className="border-primary bg-primary text-secondary rounded border-[1px] p-1"
+                className="border-primary bg-primary text-primary-foreground rounded border-DEFAULT p-1"
                 size={ICON_SIZE}
               />
 
               <div className="text-lg font-semibold">Prompt</div>
             </div>
           ) : (
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 rounded-full">
               {message.role === "assistant" ? (
                 messageAssistantImage ? (
                   <Image
@@ -220,7 +217,7 @@ export const Message: FC<MessageProps> = ({
                       width: `${ICON_SIZE}px`,
                       height: `${ICON_SIZE}px`
                     }}
-                    className="rounded"
+                    className="rounded-full"
                     src={messageAssistantImage}
                     alt="assistant image"
                     height={ICON_SIZE}
@@ -240,15 +237,15 @@ export const Message: FC<MessageProps> = ({
                 )
               ) : profile?.image_url ? (
                 <Image
-                  className={`size-[32px] rounded`}
+                  className={`size-[32px] rounded-full`}
                   src={profile?.image_url}
                   height={32}
                   width={32}
                   alt="user image"
                 />
               ) : (
-                <IconMoodSmile
-                  className="bg-primary text-secondary border-primary rounded border-[1px] p-1"
+                <IconUserCircle
+                  className="bg-primary text-neutral border-primary rounded-full border-DEFAULT p-1"
                   size={ICON_SIZE}
                 />
               )}

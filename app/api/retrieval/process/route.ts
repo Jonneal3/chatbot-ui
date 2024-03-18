@@ -1,4 +1,3 @@
-import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
 import {
   processCSV,
   processJSON,
@@ -90,18 +89,6 @@ export async function POST(req: Request) {
       embeddings = response.data.map((item: any) => {
         return item.embedding
       })
-    } else if (embeddingsProvider === "local") {
-      const embeddingPromises = chunks.map(async chunk => {
-        try {
-          return await generateLocalEmbedding(chunk.content)
-        } catch (error) {
-          console.error(`Error generating embedding for chunk: ${chunk}`, error)
-
-          return null
-        }
-      })
-
-      embeddings = await Promise.all(embeddingPromises)
     }
 
     const file_items = chunks.map((chunk, index) => ({
@@ -111,10 +98,6 @@ export async function POST(req: Request) {
       tokens: chunk.tokens,
       openai_embedding:
         embeddingsProvider === "openai"
-          ? ((embeddings[index] || null) as any)
-          : null,
-      local_embedding:
-        embeddingsProvider === "local"
           ? ((embeddings[index] || null) as any)
           : null
     }))

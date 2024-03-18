@@ -63,7 +63,8 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       return router.push(`/${selectedWorkspace.id}/chat/${createdChat.id}`)
     },
     tools: async (item: any) => {},
-    models: async (item: any) => {}
+    models: async (item: any) => {},
+    connections: async (item: any) => {}
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -94,7 +95,7 @@ export const SidebarItem: FC<SidebarItemProps> = ({
       <div
         ref={itemRef}
         className={cn(
-          "hover:bg-accent flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none"
+          "hover:bg-secondary hover:text-primary-content focus:bg-secondary flex w-full cursor-pointer items-center rounded p-2 hover:bg-opacity-70 hover:opacity-70 focus:outline-none"
         )}
         tabIndex={0}
         onKeyDown={handleKeyDown}

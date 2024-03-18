@@ -73,7 +73,7 @@ export const WorkspaceSettings: FC<WorkspaceSettingsProps> = ({}) => {
       )?.base64 || ""
 
     setImageLink(workspaceImage)
-  }, [workspaceImages])
+  }, [selectedWorkspace?.image_path, workspaceImages])
 
   const handleSave = async () => {
     if (!selectedWorkspace) return

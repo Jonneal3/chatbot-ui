@@ -7,7 +7,7 @@ import {
 import { Announcement } from "@/types/announcement"
 import { IconExternalLink, IconSpeakerphone } from "@tabler/icons-react"
 import { FC, useEffect, useState } from "react"
-import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
+import { SIDEBAR_ICON_SIZE } from "../sidebar/switcher/sidebar-switcher"
 
 interface AnnouncementsProps {}
 
@@ -50,7 +50,7 @@ export const Announcements: FC<AnnouncementsProps> = () => {
     // Update state and local storage
     setAnnouncements(updatedAnnouncements)
     localStorage.setItem("announcements", JSON.stringify(updatedAnnouncements))
-  }, [])
+  }, [announcements])
 
   const unreadCount = announcements.filter(a => !a.read).length
 

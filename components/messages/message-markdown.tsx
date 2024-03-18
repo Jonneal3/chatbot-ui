@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable jsx-a11y/alt-text */
 import React, { FC } from "react"
 import remarkGfm from "remark-gfm"
 import remarkMath from "remark-math"

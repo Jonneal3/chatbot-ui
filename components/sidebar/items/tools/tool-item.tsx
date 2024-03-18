@@ -1,18 +1,39 @@
+/* eslint-disable @next/next/no-img-element */
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
-import { validateOpenAPI } from "@/lib/openapi-conversion"
 import { Tables } from "@/supabase/types"
-import { IconBolt } from "@tabler/icons-react"
-import { FC, useState } from "react"
+import { FC, useState, useEffect, useContext } from "react"
 import { SidebarItem } from "../all/sidebar-display-item"
+import { IconTool } from "@tabler/icons-react"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem
+} from "@/components/ui/dropdown-menu"
+import { getConnectionWorkspacesByWorkspaceId } from "@/db/connections"
+import { ChatbotUIContext } from "@/context/context"
+
+interface AuthIntegration {
+  image: string
+  id: string
+}
+
+interface ConnectionWithIntegration {
+  connection_id: string
+  name: string
+  integration: AuthIntegration
+}
 
 interface ToolItemProps {
   tool: Tables<"tools">
 }
 
 export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
+  const { selectedWorkspace } = useContext(ChatbotUIContext)
   const [name, setName] = useState(tool.name)
   const [isTyping, setIsTyping] = useState(false)
   const [description, setDescription] = useState(tool.description)
@@ -21,20 +42,79 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
     tool.custom_headers as string
   )
   const [schema, setSchema] = useState(tool.schema as string)
-  const [schemaError, setSchemaError] = useState("")
+  const [isRequestInBody, setIsRequestInBody] = useState(tool.request_in_body)
+  const [connectedAccount, setConnectedAccount] = useState(
+    tool.connection_id || ""
+  )
+  const [dropdownOptions, setDropdownOptions] = useState<
+    ConnectionWithIntegration[]
+  >([])
+
+  useEffect(() => {
+    const fetchConnections = async () => {
+      try {
+        const connections = await getConnectionWorkspacesByWorkspaceId(
+          selectedWorkspace?.id as string
+        )
+        const dropdownOptions = await Promise.all(
+          connections.connections.map(async connection => {
+            // Fetch auth_integration data for each connection
+            const integrationResponse = await fetchIntegrationData(
+              connection.integration_id
+            )
+            return {
+              connection_id: connection.id,
+              name: connection.name,
+              integration: integrationResponse
+            }
+          })
+        )
+        setDropdownOptions(dropdownOptions)
+      } catch (error) {
+        console.error("Error fetching connections:", error)
+      }
+    }
+
+    fetchConnections()
+
+    // Cleanup function
+    return () => {
+      // Perform cleanup if needed
+    }
+  }, [selectedWorkspace])
+
+  const fetchIntegrationData = async (
+    integrationKey: string
+  ): Promise<AuthIntegration> => {
+    try {
+      // Fetch auth_integration data using integrationKey
+      const response = await fetch(`/integrations/${integrationKey}`)
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error("Error fetching auth_integration data:", error)
+      return { image: "", id: "" } // Return default value if error occurs
+    }
+  }
+
+  const handleDropdownChange = (value: string) => {
+    setConnectedAccount(value)
+  }
 
   return (
     <SidebarItem
       item={tool}
       isTyping={isTyping}
       contentType="tools"
-      icon={<IconBolt size={30} />}
+      icon={<IconTool />}
       updateState={{
         name,
         description,
         url,
         custom_headers: customHeaders,
-        schema
+        schema,
+        request_in_body: isRequestInBody,
+        connection_id: connectedAccount // Include connectedAccount in updateState
       }}
       renderInputs={() => (
         <>
@@ -60,35 +140,57 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
             />
           </div>
 
-          {/* <div className="space-y-1">
-            <Label>URL</Label>
-
-            <Input
-              placeholder="Tool url..."
-              value={url}
-              onChange={e => setUrl(e.target.value)}
-            />
-          </div> */}
-
-          {/* <div className="space-y-3 pt-4 pb-3">
-            <div className="space-x-2 flex items-center">
-              <Checkbox />
-
-              <Label>Web Browsing</Label>
-            </div>
-
-            <div className="space-x-2 flex items-center">
-              <Checkbox />
-
-              <Label>Image Generation</Label>
-            </div>
-
-            <div className="space-x-2 flex items-center">
-              <Checkbox />
-
-              <Label>Code Interpreter</Label>
-            </div>
-          </div> */}
+          <div className="space-y-1">
+            <Label>Connected Accounts</Label>
+            <div></div>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Input
+                  type="text"
+                  placeholder={`Select Connected Account (${dropdownOptions.length} connections)`}
+                  value={connectedAccount}
+                  onChange={e => setConnectedAccount(e.target.value)}
+                  readOnly={dropdownOptions.length === 0}
+                  style={{
+                    width: "20.9vw",
+                    cursor:
+                      dropdownOptions.length === 0 ? "not-allowed" : "pointer"
+                  }}
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {dropdownOptions.length === 0 ? (
+                  <DropdownMenuItem disabled>
+                    No connections available
+                  </DropdownMenuItem>
+                ) : (
+                  dropdownOptions.map(option => (
+                    <DropdownMenuItem
+                      key={option.connection_id}
+                      onClick={() => handleDropdownChange(option.connection_id)}
+                      style={{
+                        width: "20vw",
+                        display: "flex",
+                        alignItems: "center"
+                      }}
+                    >
+                      <img
+                        src={option.integration.image}
+                        alt="Logo"
+                        style={{
+                          marginRight: "0.5rem",
+                          width: "2rem",
+                          height: "2rem"
+                        }}
+                      />
+                      <span>{option.name}</span>{" "}
+                      {/* Display connected account name */}
+                    </DropdownMenuItem>
+                  ))
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
           <div className="space-y-1">
             <Label>Custom Headers</Label>
@@ -142,22 +244,33 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
                 }
               }`}
               value={schema}
-              onValueChange={value => {
-                setSchema(value)
-
-                try {
-                  const parsedSchema = JSON.parse(value)
-                  validateOpenAPI(parsedSchema)
-                    .then(() => setSchemaError("")) // Clear error if validation is successful
-                    .catch(error => setSchemaError(error.message)) // Set specific validation error message
-                } catch (error) {
-                  setSchemaError("Invalid JSON format") // Set error for invalid JSON format
-                }
-              }}
+              onValueChange={setSchema}
               minRows={15}
             />
+          </div>
 
-            <div className="text-xs text-red-500">{schemaError}</div>
+          <div className="space-y-1">
+            <Label>Request in...</Label>
+
+            <Tabs
+              defaultValue={isRequestInBody ? "body" : "url"}
+              className="w-[400px]"
+            >
+              <TabsList>
+                <TabsTrigger
+                  value="body"
+                  onClick={() => setIsRequestInBody(true)}
+                >
+                  Body
+                </TabsTrigger>
+                <TabsTrigger
+                  value="url"
+                  onClick={() => setIsRequestInBody(false)}
+                >
+                  URL
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </>
       )}

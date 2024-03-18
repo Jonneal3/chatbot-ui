@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
@@ -56,6 +57,12 @@ import {
   updateModel
 } from "@/db/models"
 import {
+  createConnectionWorkspaces,
+  deleteConnectionWorkspace,
+  getConnectionWorkspacesByConnectionId,
+  updateConnection
+} from "@/db/connections"
+import {
   createPresetWorkspaces,
   deletePresetWorkspace,
   getPresetWorkspacesByPresetId,
@@ -113,7 +120,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     setAssistants,
     setTools,
     setModels,
-    setAssistantImages
+    setAssistantImages,
+    setConnections
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -196,7 +204,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       setSelectedAssistantTools
     },
     tools: null,
-    models: null
+    models: null,
+    connections: null
   }
 
   const fetchDataFunctions = {
@@ -226,7 +235,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       setSelectedAssistantTools([])
     },
     tools: null,
-    models: null
+    models: null,
+    connections: null
   }
 
   const fetchWorkpaceFunctions = {
@@ -257,6 +267,10 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     models: async (modelId: string) => {
       const item = await getModelWorkspacesByModelId(modelId)
+      return item.workspaces
+    },
+    connections: async (connectionId: string) => {
+      const item = await getConnectionWorkspacesByConnectionId(connectionId)
       return item.workspaces
     }
   }
@@ -555,6 +569,26 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
 
       return updatedTool
     },
+    connections: async (
+      connectionId: string,
+      updateState: TablesUpdate<"connections">
+    ) => {
+      const updatedConnection = await updateConnection(
+        connectionId,
+        updateState
+      )
+
+      await handleWorkspaceUpdates(
+        startingWorkspaces,
+        selectedWorkspaces,
+        connectionId,
+        deleteConnectionWorkspace,
+        createConnectionWorkspaces as any,
+        "connection_id"
+      )
+
+      return updatedConnection
+    },
     models: async (modelId: string, updateState: TablesUpdate<"models">) => {
       const updatedModel = await updateModel(modelId, updateState)
 
@@ -579,7 +613,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     collections: setCollections,
     assistants: setAssistants,
     tools: setTools,
-    models: setModels
+    models: setModels,
+    connections: setConnections
   }
 
   const handleUpdate = async () => {

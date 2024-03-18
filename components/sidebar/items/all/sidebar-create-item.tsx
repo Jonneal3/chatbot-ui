@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -17,6 +18,7 @@ import { createCollection } from "@/db/collections"
 import { createFileBasedOnExtension } from "@/db/files"
 import { createModel } from "@/db/models"
 import { createPreset } from "@/db/presets"
+import { createConnection } from "@/db/connections"
 import { createPrompt } from "@/db/prompts"
 import {
   getAssistantImageFromStorage,
@@ -56,7 +58,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     setAssistants,
     setAssistantImages,
     setTools,
-    setModels
+    setModels,
+    setConnections
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -66,6 +69,7 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
   const createFunctions = {
     chats: createChat,
     presets: createPreset,
+    connections: createConnection,
     prompts: createPrompt,
     files: async (
       createState: { file: File } & TablesInsert<"files">,
@@ -181,12 +185,15 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     collections: setCollections,
     assistants: setAssistants,
     tools: setTools,
-    models: setModels
+    models: setModels,
+    connections: setConnections
   }
+
+  const { profile } = useContext(ChatbotUIContext)
 
   const handleCreate = async () => {
     try {
-      if (!selectedWorkspace) return
+      if (!profile || !selectedWorkspace) return // Check if profile or selectedWorkspace is null
       if (isTyping) return // Prevent creation while typing
 
       const createFunction = createFunctions[contentType]
@@ -196,7 +203,11 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
 
       setCreating(true)
 
-      const newItem = await createFunction(createState, selectedWorkspace.id)
+      const newItem = await createFunction(
+        createState,
+        selectedWorkspace.id,
+        profile.user_id
+      )
 
       setStateFunction((prevItems: any) => [...prevItems, newItem])
 

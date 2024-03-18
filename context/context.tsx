@@ -38,6 +38,8 @@ interface ChatbotUIContext {
   setTools: Dispatch<SetStateAction<Tables<"tools">[]>>
   workspaces: Tables<"workspaces">[]
   setWorkspaces: Dispatch<SetStateAction<Tables<"workspaces">[]>>
+  connections: Tables<"connections">[]
+  setConnections: Dispatch<SetStateAction<Tables<"connections">[]>>
 
   // MODELS STORE
   envKeyMap: Record<string, VALID_ENV_KEYS>
@@ -58,6 +60,10 @@ interface ChatbotUIContext {
   // PRESET STORE
   selectedPreset: Tables<"presets"> | null
   setSelectedPreset: Dispatch<SetStateAction<Tables<"presets"> | null>>
+
+  // CONNECTION STORE
+  selectedConnection: Tables<"connections"> | null
+  setSelectedConnection: Dispatch<SetStateAction<Tables<"connections"> | null>>
 
   // ASSISTANT STORE
   selectedAssistant: Tables<"assistants"> | null
@@ -164,6 +170,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setTools: () => {},
   workspaces: [],
   setWorkspaces: () => {},
+  connections: [],
+  setConnections: () => {},
 
   // MODELS STORE
   envKeyMap: {},
@@ -184,6 +192,10 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   // PRESET STORE
   selectedPreset: null,
   setSelectedPreset: () => {},
+
+  // CONNECTION STORE
+  selectedConnection: null,
+  setSelectedConnection: () => {},
 
   // ASSISTANT STORE
   selectedAssistant: null,

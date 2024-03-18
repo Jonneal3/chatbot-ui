@@ -4,14 +4,15 @@ import { createFolder } from "@/db/folders"
 import { ContentType } from "@/types"
 import { IconFolderPlus, IconPlus } from "@tabler/icons-react"
 import { FC, useContext, useState } from "react"
-import { Button } from "../ui/button"
-import { CreateAssistant } from "./items/assistants/create-assistant"
-import { CreateCollection } from "./items/collections/create-collection"
-import { CreateFile } from "./items/files/create-file"
-import { CreateModel } from "./items/models/create-model"
-import { CreatePreset } from "./items/presets/create-preset"
-import { CreatePrompt } from "./items/prompts/create-prompt"
-import { CreateTool } from "./items/tools/create-tool"
+import { Button } from "../../ui/button"
+import { CreateAssistant } from "../items/assistants/create-assistant"
+import { CreateCollection } from "../items/collections/create-collection"
+import { CreateFile } from "../items/files/create-file"
+import { CreateModel } from "../items/models/create-model"
+import { CreatePreset } from "../items/presets/create-preset"
+import { CreatePrompt } from "../items/prompts/create-prompt"
+import { CreateTool } from "../items/tools/create-tool"
+import { CreateConnection } from "../items/connections/create-connection"
 
 interface SidebarCreateButtonsProps {
   contentType: ContentType
@@ -33,6 +34,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   const [isCreatingAssistant, setIsCreatingAssistant] = useState(false)
   const [isCreatingTool, setIsCreatingTool] = useState(false)
   const [isCreatingModel, setIsCreatingModel] = useState(false)
+  const [isCreatingConnection, setIsCreatingConnection] = useState(false)
 
   const handleCreateFolder = async () => {
     if (!profile) return
@@ -88,6 +90,11 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       case "models":
         return async () => {
           setIsCreatingModel(true)
+        }
+
+      case "connections":
+        return async () => {
+          setIsCreatingConnection(true)
         }
 
       default:
@@ -150,6 +157,13 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
         <CreateModel
           isOpen={isCreatingModel}
           onOpenChange={setIsCreatingModel}
+        />
+      )}
+
+      {isCreatingConnection && (
+        <CreateConnection
+          isOpen={isCreatingConnection}
+          onOpenChange={setIsCreatingConnection}
         />
       )}
     </div>

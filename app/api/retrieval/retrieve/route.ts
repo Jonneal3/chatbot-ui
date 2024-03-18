@@ -1,4 +1,3 @@
-import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
@@ -68,21 +67,6 @@ export async function POST(request: Request) {
       }
 
       chunks = openaiFileItems
-    } else if (embeddingsProvider === "local") {
-      const localEmbedding = await generateLocalEmbedding(userInput)
-
-      const { data: localFileItems, error: localFileItemsError } =
-        await supabaseAdmin.rpc("match_file_items_local", {
-          query_embedding: localEmbedding as any,
-          match_count: sourceCount,
-          file_ids: uniqueFileIds
-        })
-
-      if (localFileItemsError) {
-        throw localFileItemsError
-      }
-
-      chunks = localFileItems
     }
 
     const mostSimilarChunks = chunks?.sort(
