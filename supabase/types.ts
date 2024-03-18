@@ -586,6 +586,7 @@ export type Database = {
       connections: {
         Row: {
           created_at: string
+          sharing: string
           folder_id: string | null
           id: string
           integration_id: string
@@ -595,6 +596,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          sharing: string
           folder_id?: string | null
           id?: string
           integration_id?: string
@@ -604,6 +606,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          sharing: string
           folder_id?: string | null
           id?: string
           integration_id?: string

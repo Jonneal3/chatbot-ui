@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label"
 import { CONNECTION_NAME_MAX } from "@/db/limits"
 import { Tables, TablesUpdate } from "@/supabase/types"
 import { FC, useState } from "react"
-import { SidebarItem } from "@/components/sidebar/items/all/sidebar-display-item"
+import { SidebarItem } from "../all/sidebar-display-item"
 import { IconArrowsSort } from "@tabler/icons-react"
 
 interface ConnectionItemProps {
@@ -12,7 +12,12 @@ interface ConnectionItemProps {
 
 export const ConnectionItem: FC<ConnectionItemProps> = ({ connection }) => {
   const [isTyping, setIsTyping] = useState(false)
-  const [name, setName] = useState(connection.name)
+  const [name, setName] = useState(connection.name || "") // Initialize with connection name or empty string
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value)
+    setIsTyping(true) // Set isTyping to true when typing
+  }
 
   return (
     <SidebarItem
@@ -20,24 +25,15 @@ export const ConnectionItem: FC<ConnectionItemProps> = ({ connection }) => {
       isTyping={isTyping}
       contentType="connections"
       icon={<IconArrowsSort height={26} width={26} />}
-      updateState={
-        {
-          id: connection.id,
-          name,
-          integration_id: connection.integration_id,
-          user_id: connection.user_id,
-          metadata: connection.metadata
-        } as TablesUpdate<"connections">
-      }
+      updateState={{ name } as TablesUpdate<"connections">} // Update only the name field
       renderInputs={() => (
         <>
           <div className="space-y-1">
             <Label>Name</Label>
-
             <Input
               placeholder="Connection name..."
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={handleNameChange}
               maxLength={CONNECTION_NAME_MAX}
             />
           </div>

@@ -9,7 +9,7 @@ export const getConnectionById = async (connectionId: string) => {
     .single()
 
   if (!connection) {
-    throw new Error("Connection not found")
+    throw new Error(error.message)
   }
 
   return connection

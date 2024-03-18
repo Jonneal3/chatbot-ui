@@ -1,3 +1,4 @@
+/* eslint-disable tailwindcss/migration-from-tailwind-2 */
 import { ContentType } from "@/types"
 import { FC } from "react"
 import { TabsTrigger } from "../../ui/tabs"

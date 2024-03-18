@@ -180,6 +180,7 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
 
     const updatedItem = await updateFunction(item.id, {
       id: item.id,
+      sharing: "private",
       name: item.name, // replace with the actual property name
       integration_id: item.integration_id, // replace with the actual property name
       user_id: item.user_id, // replace with the actual property name

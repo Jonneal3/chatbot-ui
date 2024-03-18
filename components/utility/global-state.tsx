@@ -8,6 +8,7 @@ import { getProfileByUserId } from "@/db/profile"
 import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
 import { getWorkspacesByUserId } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
+import { getConnectionWorkspacesByWorkspaceId } from "@/db/connections"
 import {
   fetchHostedModels,
   fetchOllamaModels,
@@ -171,35 +172,73 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         return router.push("/setup")
       }
 
-      const workspaces = await getWorkspacesByUserId(user.id)
-      setWorkspaces(workspaces)
+      try {
+        const workspaces = await getWorkspacesByUserId(user.id)
+        setWorkspaces(workspaces)
 
-      for (const workspace of workspaces) {
-        let workspaceImageUrl = ""
+        // Initialize an array to collect all connections from workspaces
+        let allWorkspaceConnections: ConnectionType[] = []
 
-        if (workspace.image_path) {
-          workspaceImageUrl =
-            (await getWorkspaceImageFromStorage(workspace.image_path)) || ""
+        for (const workspace of workspaces) {
+          console.log("Fetching connections for workspace:", workspace.id)
+
+          // Fetch connections for the current workspace
+          try {
+            const workspaceConnections =
+              await getConnectionWorkspacesByWorkspaceId(workspace.id)
+            console.log(
+              "Connections for workspace",
+              workspace.id,
+              ":",
+              workspaceConnections.connections
+            )
+            // Add the fetched connections to the array
+            allWorkspaceConnections = [
+              ...allWorkspaceConnections,
+              ...workspaceConnections.connections
+            ]
+          } catch (error) {
+            console.error(
+              "Error fetching connections for workspace:",
+              workspace.id,
+              error
+            )
+          }
+
+          // Fetch other data related to the workspace (e.g., images)
+          let workspaceImageUrl = ""
+
+          if (workspace.image_path) {
+            workspaceImageUrl =
+              (await getWorkspaceImageFromStorage(workspace.image_path)) || ""
+          }
+
+          if (workspaceImageUrl) {
+            const response = await fetch(workspaceImageUrl)
+            const blob = await response.blob()
+            const base64 = await convertBlobToBase64(blob)
+
+            // Update only the workspace images list with the fetched image data
+            setWorkspaceImages(prev => [
+              ...prev,
+              {
+                workspaceId: workspace.id,
+                path: workspace.image_path,
+                base64: base64,
+                url: workspaceImageUrl
+              }
+            ])
+          }
         }
 
-        if (workspaceImageUrl) {
-          const response = await fetch(workspaceImageUrl)
-          const blob = await response.blob()
-          const base64 = await convertBlobToBase64(blob)
+        // Update the connections state after fetching all connections
+        setConnections(allWorkspaceConnections)
 
-          setWorkspaceImages(prev => [
-            ...prev,
-            {
-              workspaceId: workspace.id,
-              path: workspace.image_path,
-              base64: base64,
-              url: workspaceImageUrl
-            }
-          ])
-        }
+        return profile
+      } catch (error) {
+        console.error("Error fetching workspaces:", error)
+        // Handle error fetching workspaces
       }
-
-      return profile
     }
   }
 

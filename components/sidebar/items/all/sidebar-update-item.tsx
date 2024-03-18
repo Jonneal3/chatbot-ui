@@ -573,6 +573,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       connectionId: string,
       updateState: TablesUpdate<"connections">
     ) => {
+      console.log("connection ID", connectionId)
       const updatedConnection = await updateConnection(
         connectionId,
         updateState

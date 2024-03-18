@@ -1,4 +1,11 @@
-import { processDocX } from "@/lib/retrieval/processing"
+import { generateLocalEmbedding } from "@/lib/generate-local-embedding"
+import {
+  processCSV,
+  processJSON,
+  processMarkdown,
+  processPdf,
+  processTxt
+} from "@/lib/retrieval/processing"
 import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { Database } from "@/supabase/types"
 import { FileItemChunk } from "@/types"
@@ -7,14 +14,6 @@ import { NextResponse } from "next/server"
 import OpenAI from "openai"
 
 export async function POST(req: Request) {
-  const json = await req.json()
-  const { text, fileId, embeddingsProvider, fileExtension } = json as {
-    text: string
-    fileId: string
-    embeddingsProvider: "openai" | "local"
-    fileExtension: string
-  }
-
   try {
     const supabaseAdmin = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,6 +21,16 @@ export async function POST(req: Request) {
     )
 
     const profile = await getServerProfile()
+
+    const formData = await req.formData()
+
+    const file = formData.get("file") as File
+    const file_id = formData.get("file_id") as string
+    const embeddingsProvider = formData.get("embeddingsProvider") as string
+
+    const fileBuffer = Buffer.from(await file.arrayBuffer())
+    const blob = new Blob([fileBuffer])
+    const fileExtension = file.name.split(".").pop()?.toLowerCase()
 
     if (embeddingsProvider === "openai") {
       if (profile.use_azure_openai) {
@@ -34,8 +43,20 @@ export async function POST(req: Request) {
     let chunks: FileItemChunk[] = []
 
     switch (fileExtension) {
-      case "docx":
-        chunks = await processDocX(text)
+      case "csv":
+        chunks = await processCSV(blob)
+        break
+      case "json":
+        chunks = await processJSON(blob)
+        break
+      case "md":
+        chunks = await processMarkdown(blob)
+        break
+      case "pdf":
+        chunks = await processPdf(blob)
+        break
+      case "txt":
+        chunks = await processTxt(blob)
         break
       default:
         return new NextResponse("Unsupported file type", {
@@ -69,15 +90,31 @@ export async function POST(req: Request) {
       embeddings = response.data.map((item: any) => {
         return item.embedding
       })
+    } else if (embeddingsProvider === "local") {
+      const embeddingPromises = chunks.map(async chunk => {
+        try {
+          return await generateLocalEmbedding(chunk.content)
+        } catch (error) {
+          console.error(`Error generating embedding for chunk: ${chunk}`, error)
+
+          return null
+        }
+      })
+
+      embeddings = await Promise.all(embeddingPromises)
     }
 
     const file_items = chunks.map((chunk, index) => ({
-      file_id: fileId,
+      file_id,
       user_id: profile.user_id,
       content: chunk.content,
       tokens: chunk.tokens,
       openai_embedding:
         embeddingsProvider === "openai"
+          ? ((embeddings[index] || null) as any)
+          : null,
+      local_embedding:
+        embeddingsProvider === "local"
           ? ((embeddings[index] || null) as any)
           : null
     }))
@@ -89,13 +126,12 @@ export async function POST(req: Request) {
     await supabaseAdmin
       .from("files")
       .update({ tokens: totalTokens })
-      .eq("id", fileId)
+      .eq("id", file_id)
 
     return new NextResponse("Embed Successful", {
       status: 200
     })
   } catch (error: any) {
-    console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"
     const errorCode = error.status || 500
     return new Response(JSON.stringify({ message: errorMessage }), {
