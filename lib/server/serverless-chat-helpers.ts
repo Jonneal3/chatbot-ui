@@ -3,10 +3,9 @@ import { VALID_ENV_KEYS } from "@/types/valid-keys"
 import { createClient } from "@supabase/supabase-js"
 
 export async function getServerProfile(user_id: string) {
-
-const supabase = createClient<Database>(
+  const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
 
   const { data: profile } = await supabase

@@ -1,5 +1,8 @@
 import { CHAT_SETTING_LIMITS } from "@/lib/chat-setting-limits"
-import { checkApiKey, getServerProfile } from "@/lib/server/serverless-chat-helpers"
+import {
+  checkApiKey,
+  getServerProfile
+} from "@/lib/server/serverless-chat-helpers"
 import { ChatSettings } from "@/types"
 import OpenAI from "openai"
 
@@ -8,11 +11,11 @@ export async function POST(request: Request) {
   const json = await request.json()
   const { chatSettings, user_id, messages } = json as {
     chatSettings: ChatSettings
-    messages: any[],
+    messages: any[]
     user_id: any
   }
 
-  console.log('GROQ', user_id)
+  console.log("GROQ", user_id)
 
   try {
     const profile = await getServerProfile(user_id)
@@ -46,7 +49,6 @@ export async function POST(request: Request) {
         "Content-Type": "application/json"
       }
     })
-    
   } catch (error: any) {
     let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500

@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   try {
     const apiKey = request.headers.get("Authorization")?.split("Bearer ")[1]
 
-    console.log('key', apiKey)
+    console.log("key", apiKey)
 
     if (!apiKey) {
       return NextResponse.json(
@@ -28,26 +28,19 @@ export async function POST(request: Request) {
       .eq("id", apiKey)
       .single()
 
-    console.log('api_key_data', apiKeyData)
+    console.log("api_key_data", apiKeyData)
 
     if (apiKeyError || !apiKeyData) {
-      return NextResponse.json(
-        { error: "Invalid API key" },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Invalid API key" }, { status: 401 })
     }
 
     const userId = apiKeyData.user_id
-    console.log('USER_ID',userId)
+    console.log("USER_ID", userId)
 
     const body = await request.json()
 
     // Check if all required parameters are present
-    const requiredParams: string[] = [
-      "chat_id",
-      "assistant_id",
-      "content"
-    ]
+    const requiredParams: string[] = ["chat_id", "assistant_id", "content"]
     for (const param of requiredParams) {
       if (!(param in body)) {
         return NextResponse.json(

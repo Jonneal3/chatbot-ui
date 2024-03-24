@@ -1,7 +1,10 @@
 import { ChatMessage, ChatPayload, LLM, MessageImage } from "@/types"
 import { Database, Tables } from "@/supabase/types"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
-import { buildGoogleGeminiFinalMessages, buildFinalMessages } from "@/lib/build-prompt"
+import {
+  buildGoogleGeminiFinalMessages,
+  buildFinalMessages
+} from "@/lib/build-prompt"
 
 export const handleHostedChat = async (
   payload: ChatPayload,
@@ -19,7 +22,7 @@ export const handleHostedChat = async (
       ? "azure"
       : modelData.provider
 
-  console.log('provider', provider)
+  console.log("provider", provider)
 
   const user_id = profile.user_id
   console.log("user_id checkpoint 1", user_id)
@@ -37,8 +40,9 @@ export const handleHostedChat = async (
   }
 
   const apiEndpoint =
-    provider === "custom" ? `${process.env.SITE_URL}/api/v1/chat/custom` : `${process.env.SITE_URL}/api/v1/chat/${provider}`
-    
+    provider === "custom"
+      ? `${process.env.SITE_URL}/api/v1/chat/custom`
+      : `${process.env.SITE_URL}/api/v1/chat/${provider}`
 
   const requestBody = {
     chatSettings: payload.chatSettings,
@@ -47,76 +51,77 @@ export const handleHostedChat = async (
     customModelId: provider === "custom" ? modelData.hostedId : ""
   }
 
-  console.log('chat request:', requestBody);
-  console.log('apiEndpoint555:', apiEndpoint);
-  console.log('newAbortController:', newAbortController);
+  console.log("chat request:", requestBody)
+  console.log("apiEndpoint555:", apiEndpoint)
+  console.log("newAbortController:", newAbortController)
 
   const response = await fetchChatResponse(
     apiEndpoint,
     requestBody,
     true,
-    newAbortController,
+    newAbortController
   )
 
   console.log("response", response)
 
   // Return the response and any other necessary data
-  return { response, formattedMessages };
+  return { response, formattedMessages }
 }
 
 export const fetchChatResponse = async (
   url: string,
   body: object,
   isHosted: boolean,
-  controller: AbortController,
+  controller: AbortController
 ) => {
   try {
     const response = await fetch(url, {
       method: "POST",
       body: JSON.stringify(body),
       signal: controller.signal
-    });
+    })
 
     // Extract JSON content from the response
-    const responseData = await response.json();
+    const responseData = await response.json()
 
-    console.log('RESPONSE 2134', responseData); // Now responseData contains the full GPT-like response
+    console.log("RESPONSE 2134", responseData) // Now responseData contains the full GPT-like response
 
     if (!response.ok) {
       // If response status is not OK (2xx), handle the error
-      let errorMessage = "An error occurred while fetching the chat response.";
+      let errorMessage = "An error occurred while fetching the chat response."
 
       // Check specific error cases
       if (response.status === 404 && !isHosted) {
         // If the response status is 404 and it's not a hosted environment
-        errorMessage = "Chat endpoint not found.";
+        errorMessage = "Chat endpoint not found."
       } else {
         // For other error statuses, try to parse the error response body
         try {
-          const errorData = await response.json();
+          const errorData = await response.json()
           if (errorData && errorData.message) {
-            errorMessage = errorData.message;
+            errorMessage = errorData.message
           } else {
-            errorMessage = `Error: ${response.statusText}`;
+            errorMessage = `Error: ${response.statusText}`
           }
         } catch (error) {
           // If there's an error parsing JSON, handle it gracefully
-          errorMessage = "Invalid server response format.";
+          errorMessage = "Invalid server response format."
         }
       }
 
       // Throw an error with the appropriate message
-      throw new Error(errorMessage);
+      throw new Error(errorMessage)
     }
 
     // If response is OK, return the response
-    return responseData;
+    return responseData
   } catch (error) {
     // Handle any network errors or exceptions during fetch
-    throw new Error(`Fetch error: ${(error instanceof Error) ? error.message : 'Unknown error occurred'}`);
+    throw new Error(
+      `Fetch error: ${error instanceof Error ? error.message : "Unknown error occurred"}`
+    )
   }
 }
-
 
 export function checkApiKey(apiKey: string | null, keyName: string) {
   if (apiKey === null || apiKey === "") {

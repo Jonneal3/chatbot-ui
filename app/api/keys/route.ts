@@ -3,7 +3,7 @@ import { createResponse } from "@/lib/server/server-utils"
 import { EnvKey } from "@/types/key-type"
 import { VALID_ENV_KEYS } from "@/types/valid-keys"
 
-console.log('test')
+console.log("test")
 
 export async function GET() {
   const envKeyMap: Record<string, VALID_ENV_KEYS> = {
@@ -25,8 +25,7 @@ export async function GET() {
     azure_embeddings_name: VALID_ENV_KEYS.AZURE_EMBEDDINGS_NAME
   }
 
-  console.log('keyMap',envKeyMap)
-
+  console.log("keyMap", envKeyMap)
 
   const isUsingEnvKeyMap = Object.keys(envKeyMap).reduce<
     Record<string, boolean>

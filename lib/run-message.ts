@@ -8,27 +8,31 @@ import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { getMessagesByChatId } from "@/db/messages" // Import the function to retrieve messages by chat ID
-import { getAssistantById, getAssistantWorkspacesByAssistantId } from "@/db/assistants"
+import {
+  getAssistantById,
+  getAssistantWorkspacesByAssistantId
+} from "@/db/assistants"
 import { createMessage } from "@/db/messages"
 import { handleRetrieval } from "@/lib/api/retrieval-index"
 import { tools } from "@/lib/api/tools"
 import { getProfileByUserId } from "@/db/profile"
-import { fetchHostedModels, fetchOpenRouterModels } from "@/lib/models/api/fetch-models";
-import { OpenRouterLLM, LLM } from "@/types";
+import {
+  fetchHostedModels,
+  fetchOpenRouterModels
+} from "@/lib/models/api/fetch-models"
+import { OpenRouterLLM, LLM } from "@/types"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
 import { Dispatch, SetStateAction } from "react"
 import { Tables } from "@/supabase/types"
 import { handleHostedChat } from "@/components/chat/chat-helpers/api/index"
 import { getModelWorkspacesByWorkspaceId } from "@/db/models"
-import { VALID_ENV_KEYS } from "@/types/valid-keys";
+import { VALID_ENV_KEYS } from "@/types/valid-keys"
 
-
-const isRegeneration: boolean = false;
-const newAbortController: AbortController = new AbortController();
-const newMessageImages: MessageImage[] = [];
-const setChatMessages: Dispatch<SetStateAction<ChatMessage[]>> = () => []; // Placeholder function
-const setToolInUse: Dispatch<SetStateAction<string>> = () => []; // Placeholder function
-
+const isRegeneration: boolean = false
+const newAbortController: AbortController = new AbortController()
+const newMessageImages: MessageImage[] = []
+const setChatMessages: Dispatch<SetStateAction<ChatMessage[]>> = () => [] // Placeholder function
+const setToolInUse: Dispatch<SetStateAction<string>> = () => [] // Placeholder function
 
 export const runFunction = async (
   assistant_id: any,
@@ -40,7 +44,7 @@ export const runFunction = async (
   const assistant = await getAssistantById(assistant_id)
   const profile = await getProfileByUserId(user_id)
 
-  console.log("assistant",assistant)
+  console.log("assistant", assistant)
 
   // Add Message
   const message = await createMessage({
@@ -57,96 +61,99 @@ export const runFunction = async (
 
   const model = assistant.model as LLMID
 
-    // GET MODELS
-    const workspace = await getAssistantWorkspacesByAssistantId(assistant_id);
-    const workspaceModels = await getModelWorkspacesByWorkspaceId(workspace.workspaces[0].id);
-    const models = workspaceModels.models;
+  // GET MODELS
+  const workspace = await getAssistantWorkspacesByAssistantId(assistant_id)
+  const workspaceModels = await getModelWorkspacesByWorkspaceId(
+    workspace.workspaces[0].id
+  )
+  const models = workspaceModels.models
 
-    console.log('models',models)
+  console.log("models", models)
 
-          // Initialize state for available local models
-      const envKeyMap: Record<string, VALID_ENV_KEYS> = {};
-      const availableHostedModels: LLM[] = [];
-      const availableLocalModels: LLM[] = [];
-      const availableOpenRouterModels: OpenRouterLLM[] = [];
+  // Initialize state for available local models
+  const envKeyMap: Record<string, VALID_ENV_KEYS> = {}
+  const availableHostedModels: LLM[] = []
+  const availableLocalModels: LLM[] = []
+  const availableOpenRouterModels: OpenRouterLLM[] = []
 
-      console.log("Initialized variables: ");
-      console.log("envKeyMap:", envKeyMap);
-      console.log("availableHostedModels:", availableHostedModels);
-      console.log("availableLocalModels:", availableLocalModels);
-      console.log("availableOpenRouterModels:", availableOpenRouterModels);
+  console.log("Initialized variables: ")
+  console.log("envKeyMap:", envKeyMap)
+  console.log("availableHostedModels:", availableHostedModels)
+  console.log("availableLocalModels:", availableLocalModels)
+  console.log("availableOpenRouterModels:", availableOpenRouterModels)
 
-      if (profile) {
-        console.log('profile found'
-)
-        const hostedModelRes = await fetchHostedModels(profile);
-        if (!hostedModelRes) return;
+  if (profile) {
+    console.log("profile found")
+    const hostedModelRes = await fetchHostedModels(profile)
+    if (!hostedModelRes) return
 
-        console.log('hosted_models',hostedModelRes)
+    console.log("hosted_models", hostedModelRes)
 
-        // Assign values to the declared variables directly
-        Object.assign(envKeyMap, hostedModelRes.envKeyMap);
-        availableHostedModels.push(...hostedModelRes.hostedModels);
+    // Assign values to the declared variables directly
+    Object.assign(envKeyMap, hostedModelRes.envKeyMap)
+    availableHostedModels.push(...hostedModelRes.hostedModels)
 
-        console.log("After fetching hosted models: ");
+    console.log("After fetching hosted models: ")
 
-        if (profile["openrouter_api_key"] || hostedModelRes.envKeyMap["openrouter"]) {
-          const openRouterModels = await fetchOpenRouterModels();
-          if (!openRouterModels) return;
+    if (
+      profile["openrouter_api_key"] ||
+      hostedModelRes.envKeyMap["openrouter"]
+    ) {
+      const openRouterModels = await fetchOpenRouterModels()
+      if (!openRouterModels) return
 
-          // Ensure each model conforms to the OpenRouterLLM interface before pushing to the array
-          openRouterModels.forEach((model: any) => {
-            const formattedModel: OpenRouterLLM = {
-              modelId: model.modelId,
-              modelName: model.modelName,
-              provider: model.provider,
-              hostedId: model.hostedId,
-              platformLink: model.platformLink,
-              imageInput: model.imageInput,
-              maxContext: model.maxContext // Additional property for OpenRouterLLM
-            };
-            availableOpenRouterModels.push(formattedModel);
-          });
-
-          console.log("After fetching open router models: ");
-          console.log("availableOpenRouterModels:", availableOpenRouterModels);
+      // Ensure each model conforms to the OpenRouterLLM interface before pushing to the array
+      openRouterModels.forEach((model: any) => {
+        const formattedModel: OpenRouterLLM = {
+          modelId: model.modelId,
+          modelName: model.modelName,
+          provider: model.provider,
+          hostedId: model.hostedId,
+          platformLink: model.platformLink,
+          imageInput: model.imageInput,
+          maxContext: model.maxContext // Additional property for OpenRouterLLM
         }
-      }
+        availableOpenRouterModels.push(formattedModel)
+      })
 
-    // Tools
-    const assistantTools = (await getAssistantToolsByAssistantId(assistant_id))
-      .tools
-    console.log("Tools", "tools")
-
-    // Files
-    let allFiles = []
-
-    const assistantFiles = (await getAssistantFilesByAssistantId(assistant_id))
-      .files
-    allFiles = [...assistantFiles]
-    const assistantCollections = (
-      await getAssistantCollectionsByAssistantId(assistant_id)
-    ).collections
-    for (const collection of assistantCollections) {
-      const collectionFiles = (
-        await getCollectionFilesByCollectionId(collection.id)
-      ).files
-      allFiles = [...allFiles, ...collectionFiles]
+      console.log("After fetching open router models: ")
+      console.log("availableOpenRouterModels:", availableOpenRouterModels)
     }
+  }
 
-    console.log("All Files", "tools")
+  // Tools
+  const assistantTools = (await getAssistantToolsByAssistantId(assistant_id))
+    .tools
+  console.log("Tools", "tools")
 
-    const selectedTools = assistantTools
-    const setChatFiles = allFiles.map(file => ({
-      id: file.id,
-      name: file.name,
-      type: file.type,
-      file: null
-    }))
+  // Files
+  let allFiles = []
+
+  const assistantFiles = (await getAssistantFilesByAssistantId(assistant_id))
+    .files
+  allFiles = [...assistantFiles]
+  const assistantCollections = (
+    await getAssistantCollectionsByAssistantId(assistant_id)
+  ).collections
+  for (const collection of assistantCollections) {
+    const collectionFiles = (
+      await getCollectionFilesByCollectionId(collection.id)
+    ).files
+    allFiles = [...allFiles, ...collectionFiles]
+  }
+
+  console.log("All Files", "tools")
+
+  const selectedTools = assistantTools
+  const setChatFiles = allFiles.map(file => ({
+    id: file.id,
+    name: file.name,
+    type: file.type,
+    file: null
+  }))
 
   console.log("Chat Files", "files")
   console.log("Selected Tools", "files")
-
 
   // Extract chatSettings from assistant
   const chatSettings: ChatSettings | null = assistant
@@ -161,36 +168,38 @@ export const runFunction = async (
       }
     : null
 
-      // GET MODELS API
-      const modelData = [
-        ...models.map((model: {
-          api_key: string;
-          base_url: string;
-          context_length: number;
-          created_at: string;
-          description: string;
-          folder_id: string | null;
-          id: string;
-          model_id: string;
-          name: string;
-          sharing: string;
-          updated_at: string | null;
-          user_id: string;
-        }) => ({
-          modelId: model.model_id as LLMID,
-          modelName: model.name,
-          provider: "custom" as ModelProvider,
-          hostedId: model.id,
-          platformLink: "",
-          imageInput: false
-        })),
-        ...LLM_LIST,
-        ...availableLocalModels,
-        ...availableOpenRouterModels
-      ].find(llm => llm.modelId === chatSettings?.model);
+  // GET MODELS API
+  const modelData = [
+    ...models.map(
+      (model: {
+        api_key: string
+        base_url: string
+        context_length: number
+        created_at: string
+        description: string
+        folder_id: string | null
+        id: string
+        model_id: string
+        name: string
+        sharing: string
+        updated_at: string | null
+        user_id: string
+      }) => ({
+        modelId: model.model_id as LLMID,
+        modelName: model.name,
+        provider: "custom" as ModelProvider,
+        hostedId: model.id,
+        platformLink: "",
+        imageInput: false
+      })
+    ),
+    ...LLM_LIST,
+    ...availableLocalModels,
+    ...availableOpenRouterModels
+  ].find(llm => llm.modelId === chatSettings?.model)
 
-      console.log("Final model data:", modelData);
-      console.log("Chat Settings", "files")
+  console.log("Final model data:", modelData)
+  console.log("Chat Settings", "files")
 
   // Retrieve the items from the knowledge
   const userInput: string = content
@@ -271,7 +280,7 @@ export const runFunction = async (
       model
     )
 
-     generatedText = response 
+    generatedText = response
 
     console.log("response FINAL", response)
   }
@@ -286,10 +295,10 @@ export const runFunction = async (
       newMessageImages,
       chatImages,
       setChatMessages,
-      setToolInUse,
-    );
-  
-    generatedText = hostedChatResponse.response;
+      setToolInUse
+    )
+
+    generatedText = hostedChatResponse.response
 
     const message2 = await createMessage({
       chat_id: chat_id,
@@ -301,10 +310,9 @@ export const runFunction = async (
       model: model,
       sequence_number: 1
     })
-
   }
-  
-  return generatedText;
+
+  return generatedText
 }
 
 export default runFunction

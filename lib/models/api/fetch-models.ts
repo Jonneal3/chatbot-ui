@@ -1,67 +1,68 @@
-import { isUsingEnvKeyMap } from "@/lib/api/keys";
-import { LLM, LLMID, OpenRouterLLM } from "@/types";
-import { toast } from "sonner";
-import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list";
-import { Tables } from "@/supabase/types";
+import { isUsingEnvKeyMap } from "@/lib/api/keys"
+import { LLM, LLMID, OpenRouterLLM } from "@/types"
+import { toast } from "sonner"
+import { LLM_LIST_MAP } from "@/lib/models/llm/llm-list"
+import { Tables } from "@/supabase/types"
 
 export const fetchHostedModels = async (profile: Tables<"profiles">) => {
   try {
-    const response = await isUsingEnvKeyMap(); // Corrected import statement
+    const response = await isUsingEnvKeyMap() // Corrected import statement
 
-    const data = response.isUsingEnvKeyMap; // Extracting isUsingEnvKeyMap from the response
+    const data = response.isUsingEnvKeyMap // Extracting isUsingEnvKeyMap from the response
 
-    console.log('fetch api keys', data); // Logging the data
+    console.log("fetch api keys", data) // Logging the data
 
-    const providers = ["google", "anthropic", "mistral", "groq", "perplexity"];
+    const providers = ["google", "anthropic", "mistral", "groq", "perplexity"]
 
     if (profile.use_azure_openai) {
-      providers.push("azure");
+      providers.push("azure")
     } else {
-      providers.push("openai");
+      providers.push("openai")
     }
 
-    let modelsToAdd: LLM[] = [];
+    let modelsToAdd: LLM[] = []
 
     for (const provider of providers) {
-      let providerKey: keyof typeof profile;
+      let providerKey: keyof typeof profile
 
       if (provider === "google") {
-        providerKey = "google_gemini_api_key";
+        providerKey = "google_gemini_api_key"
       } else if (provider === "azure") {
-        providerKey = "azure_openai_api_key";
+        providerKey = "azure_openai_api_key"
       } else {
-        providerKey = `${provider}_api_key` as keyof typeof profile;
+        providerKey = `${provider}_api_key` as keyof typeof profile
       }
 
-      if (profile?.[providerKey] || data[provider]) { // Checking if the provider exists in data
-        const models = LLM_LIST_MAP[provider];
+      if (profile?.[providerKey] || data[provider]) {
+        // Checking if the provider exists in data
+        const models = LLM_LIST_MAP[provider]
 
         if (Array.isArray(models)) {
-          modelsToAdd.push(...models);
+          modelsToAdd.push(...models)
         }
       }
     }
 
     return {
       envKeyMap: data, // Corrected property name
-      hostedModels: modelsToAdd,
-    };
+      hostedModels: modelsToAdd
+    }
   } catch (error) {
-    console.warn("Error fetching hosted models: " + error);
+    console.warn("Error fetching hosted models: " + error)
   }
-};
+}
 
 export const fetchOllamaModels = async () => {
   try {
     const response = await fetch(
       process.env.NEXT_PUBLIC_OLLAMA_URL + "/api/tags"
-    );
+    )
 
     if (!response.ok) {
-      throw new Error(`Ollama server is not responding.`);
+      throw new Error(`Ollama server is not responding.`)
     }
 
-    const data = await response.json();
+    const data = await response.json()
 
     const localModels: LLM[] = data.models.map((model: any) => ({
       modelId: model.name as LLMID,
@@ -70,29 +71,29 @@ export const fetchOllamaModels = async () => {
       hostedId: model.name,
       platformLink: "https://ollama.ai/library",
       imageInput: false
-    }));
+    }))
 
-    return localModels;
+    return localModels
   } catch (error) {
-    console.warn("Error fetching Ollama models: " + error);
+    console.warn("Error fetching Ollama models: " + error)
   }
-};
+}
 
 export const fetchOpenRouterModels = async () => {
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/models");
+    const response = await fetch("https://openrouter.ai/api/v1/models")
 
     if (!response.ok) {
-      throw new Error(`OpenRouter server is not responding.`);
+      throw new Error(`OpenRouter server is not responding.`)
     }
 
-    const { data } = await response.json();
+    const { data } = await response.json()
 
     const openRouterModels = data.map(
       (model: {
-        id: string;
-        name: string;
-        context_length: number;
+        id: string
+        name: string
+        context_length: number
       }): OpenRouterLLM => ({
         modelId: model.id as LLMID,
         modelName: model.id,
@@ -102,11 +103,11 @@ export const fetchOpenRouterModels = async () => {
         imageInput: false,
         maxContext: model.context_length
       })
-    );
+    )
 
-    return openRouterModels;
+    return openRouterModels
   } catch (error) {
-    console.error("Error fetching Open Router models: " + error);
-    toast.error("Error fetching Open Router models: " + error);
+    console.error("Error fetching Open Router models: " + error)
+    toast.error("Error fetching Open Router models: " + error)
   }
-};
+}

@@ -33,7 +33,7 @@ export async function tools(
     selectedTools: Tables<"tools">[]
   }
 
-  console.log("user_id_2",user_id)
+  console.log("user_id_2", user_id)
 
   try {
     const profile = await getServerProfile(user_id)

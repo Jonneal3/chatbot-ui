@@ -1,9 +1,9 @@
-import { isUsingEnvironmentKey } from "@/lib/envs";
-import { createResponse } from "@/lib/server/server-utils";
-import { EnvKey } from "@/types/key-type";
-import { VALID_ENV_KEYS } from "@/types/valid-keys";
+import { isUsingEnvironmentKey } from "@/lib/envs"
+import { createResponse } from "@/lib/server/server-utils"
+import { EnvKey } from "@/types/key-type"
+import { VALID_ENV_KEYS } from "@/types/valid-keys"
 
-console.log('test');
+console.log("test")
 
 async function checkEnvironmentKeys() {
   const envKeyMap: Record<string, VALID_ENV_KEYS> = {
@@ -23,20 +23,22 @@ async function checkEnvironmentKeys() {
     azure_gpt_45_vision_name: VALID_ENV_KEYS.AZURE_GPT_45_VISION_NAME,
     azure_gpt_45_turbo_name: VALID_ENV_KEYS.AZURE_GPT_45_TURBO_NAME,
     azure_embeddings_name: VALID_ENV_KEYS.AZURE_EMBEDDINGS_NAME
-  };
+  }
 
-  console.log('keyMap', envKeyMap);
+  console.log("keyMap", envKeyMap)
 
-  const isUsingEnvKeyMap = Object.keys(envKeyMap).reduce<Record<string, boolean>>((acc, provider) => {
-    const key = envKeyMap[provider];
+  const isUsingEnvKeyMap = Object.keys(envKeyMap).reduce<
+    Record<string, boolean>
+  >((acc, provider) => {
+    const key = envKeyMap[provider]
 
     if (key) {
-      acc[provider] = isUsingEnvironmentKey(key as EnvKey);
+      acc[provider] = isUsingEnvironmentKey(key as EnvKey)
     }
-    return acc;
-  }, {});
+    return acc
+  }, {})
 
-  return { isUsingEnvKeyMap }; // Returning an object containing isUsingEnvKeyMap property
+  return { isUsingEnvKeyMap } // Returning an object containing isUsingEnvKeyMap property
 }
 
-export { checkEnvironmentKeys as isUsingEnvKeyMap }; // Exporting the function with the alias isUsingEnvKeyMap
+export { checkEnvironmentKeys as isUsingEnvKeyMap } // Exporting the function with the alias isUsingEnvKeyMap

@@ -92,9 +92,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         {/* TODO */}
         {/* <Alerts /> */}
 
-        <WithTooltip 
-          display={<div>Billing</div>} 
-          trigger={<Account />} />
+        <WithTooltip display={<div>Billing</div>} trigger={<Account />} />
 
         <WithTooltip
           display={<div>Profile Settings</div>}

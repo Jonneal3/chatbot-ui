@@ -14,13 +14,13 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
     }
 
     //
-    console.log('profile_model', profile)
+    console.log("profile_model", profile)
 
-    const response = await fetch(`/api/keys`);
+    const response = await fetch(`/api/keys`)
 
     //
 
-    console.log('fetch api keys', response)
+    console.log("fetch api keys", response)
 
     if (!response.ok) {
       throw new Error(`Server is not responding.`)
