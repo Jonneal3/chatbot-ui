@@ -1,21 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // TODO: Separate into multiple contexts, keeping simple for now
 
-"use client"
+"use client";
 
-import { ChatbotUIContext } from "@/context/context"
-import { getProfileByUserId } from "@/db/profile"
-import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images"
-import { getWorkspacesByUserId } from "@/db/workspaces"
-import { convertBlobToBase64 } from "@/lib/blob-to-b64"
-import { getConnectionWorkspacesByWorkspaceId } from "@/db/connections"
+import { ChatbotUIContext } from "@/context/context";
+import { getProfileByUserId } from "@/db/profile";
+import { getWorkspaceImageFromStorage } from "@/db/storage/workspace-images";
+import { getWorkspacesByUserId } from "@/db/workspaces";
+import { convertBlobToBase64 } from "@/lib/blob-to-b64";
+import { getConnectionWorkspacesByWorkspaceId } from "@/db/connections";
 import {
   fetchHostedModels,
   fetchOllamaModels,
   fetchOpenRouterModels
-} from "@/lib/models/fetch-models"
-import { supabase } from "@/lib/supabase/browser-client"
-import { Tables } from "@/supabase/types"
+} from "@/lib/models/fetch-models";
+import { supabase } from "@/lib/supabase/browser-client";
+import { Tables } from "@/supabase/types";
 import {
   ChatFile,
   ChatMessage,
@@ -24,65 +24,59 @@ import {
   MessageImage,
   OpenRouterLLM,
   WorkspaceImage
-} from "@/types"
-import { AssistantImage } from "@/types/images/assistant-image"
-import { VALID_ENV_KEYS } from "@/types/valid-keys"
-import { useRouter } from "next/navigation"
-import { FC, useEffect, useState } from "react"
+} from "@/types";
+import { AssistantImage } from "@/types/images/assistant-image";
+import { VALID_ENV_KEYS } from "@/types/valid-keys";
+import { useRouter } from "next/navigation";
+import { FC, useEffect, useState } from "react";
 
 interface GlobalStateProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
-  const router = useRouter()
+  const router = useRouter();
 
   // PROFILE STORE
-  const [profile, setProfile] = useState<Tables<"profiles"> | null>(null)
+  const [profile, setProfile] = useState<Tables<"profiles"> | null>(null);
 
   // ITEMS STORE
-  const [assistants, setAssistants] = useState<Tables<"assistants">[]>([])
-  const [collections, setCollections] = useState<Tables<"collections">[]>([])
-  const [chats, setChats] = useState<Tables<"chats">[]>([])
-  const [files, setFiles] = useState<Tables<"files">[]>([])
-  const [folders, setFolders] = useState<Tables<"folders">[]>([])
-  const [models, setModels] = useState<Tables<"models">[]>([])
-  const [presets, setPresets] = useState<Tables<"presets">[]>([])
-  const [prompts, setPrompts] = useState<Tables<"prompts">[]>([])
-  const [tools, setTools] = useState<Tables<"tools">[]>([])
-  const [workspaces, setWorkspaces] = useState<Tables<"workspaces">[]>([])
-  const [connections, setConnections] = useState<Tables<"connections">[]>([])
+  const [assistants, setAssistants] = useState<Tables<"assistants">[]>([]);
+  const [collections, setCollections] = useState<Tables<"collections">[]>([]);
+  const [chats, setChats] = useState<Tables<"chats">[]>([]);
+  const [files, setFiles] = useState<Tables<"files">[]>([]);
+  const [folders, setFolders] = useState<Tables<"folders">[]>([]);
+  const [models, setModels] = useState<Tables<"models">[]>([]);
+  const [presets, setPresets] = useState<Tables<"presets">[]>([]);
+  const [prompts, setPrompts] = useState<Tables<"prompts">[]>([]);
+  const [tools, setTools] = useState<Tables<"tools">[]>([]);
+  const [workspaces, setWorkspaces] = useState<Tables<"workspaces">[]>([]);
+  const [connections, setConnections] = useState<Tables<"connections">[]>([]);
 
   // MODELS STORE
-  const [envKeyMap, setEnvKeyMap] = useState<Record<string, VALID_ENV_KEYS>>({})
-  const [availableHostedModels, setAvailableHostedModels] = useState<LLM[]>([])
-  const [availableLocalModels, setAvailableLocalModels] = useState<LLM[]>([])
-  const [availableOpenRouterModels, setAvailableOpenRouterModels] = useState<
-    OpenRouterLLM[]
-  >([])
+  const [envKeyMap, setEnvKeyMap] = useState<Record<string, VALID_ENV_KEYS>>({});
+  const [availableHostedModels, setAvailableHostedModels] = useState<LLM[]>([]);
+  const [availableLocalModels, setAvailableLocalModels] = useState<LLM[]>([]);
+  const [availableOpenRouterModels, setAvailableOpenRouterModels] = useState<OpenRouterLLM[]>([]);
 
   // WORKSPACE STORE
-  const [selectedWorkspace, setSelectedWorkspace] =
-    useState<Tables<"workspaces"> | null>(null)
-  const [workspaceImages, setWorkspaceImages] = useState<WorkspaceImage[]>([])
+  const [selectedWorkspace, setSelectedWorkspace] = useState<Tables<"workspaces"> | null>(null);
+  const [workspaceImages, setWorkspaceImages] = useState<WorkspaceImage[]>([]);
 
   // PRESET STORE
-  const [selectedPreset, setSelectedPreset] =
-    useState<Tables<"presets"> | null>(null)
+  const [selectedPreset, setSelectedPreset] = useState<Tables<"presets"> | null>(null);
 
   // CONNECTIONS STORE
-  const [selectedConnection, setSelectedConnection] =
-    useState<Tables<"connections"> | null>(null)
+  const [selectedConnection, setSelectedConnection] = useState<Tables<"connections"> | null>(null);
 
   // ASSISTANT STORE
-  const [selectedAssistant, setSelectedAssistant] =
-    useState<Tables<"assistants"> | null>(null)
-  const [assistantImages, setAssistantImages] = useState<AssistantImage[]>([])
-  const [openaiAssistants, setOpenaiAssistants] = useState<any[]>([])
+  const [selectedAssistant, setSelectedAssistant] = useState<Tables<"assistants"> | null>(null);
+  const [assistantImages, setAssistantImages] = useState<AssistantImage[]>([]);
+  const [openaiAssistants, setOpenaiAssistants] = useState<any[]>([]);
 
   // PASSIVE CHAT STORE
-  const [userInput, setUserInput] = useState<string>("")
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
+  const [userInput, setUserInput] = useState<string>("");
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatSettings, setChatSettings] = useState<ChatSettings>({
     model: "gpt-4-turbo-preview",
     prompt: "You are a helpful AI assistant.",
@@ -91,135 +85,133 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     includeProfileContext: true,
     includeWorkspaceInstructions: true,
     embeddingsProvider: "openai"
-  })
-  const [selectedChat, setSelectedChat] = useState<Tables<"chats"> | null>(null)
-  const [chatFileItems, setChatFileItems] = useState<Tables<"file_items">[]>([])
+  });
+  const [selectedChat, setSelectedChat] = useState<Tables<"chats"> | null>(null);
+  const [chatFileItems, setChatFileItems] = useState<Tables<"file_items">[]>([]);
 
   // ACTIVE CHAT STORE
-  const [isGenerating, setIsGenerating] = useState<boolean>(false)
-  const [firstTokenReceived, setFirstTokenReceived] = useState<boolean>(false)
-  const [abortController, setAbortController] =
-    useState<AbortController | null>(null)
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [firstTokenReceived, setFirstTokenReceived] = useState<boolean>(false);
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
   // CHAT INPUT COMMAND STORE
-  const [isPromptPickerOpen, setIsPromptPickerOpen] = useState(false)
-  const [slashCommand, setSlashCommand] = useState("")
-  const [isFilePickerOpen, setIsFilePickerOpen] = useState(false)
-  const [hashtagCommand, setHashtagCommand] = useState("")
-  const [isToolPickerOpen, setIsToolPickerOpen] = useState(false)
-  const [toolCommand, setToolCommand] = useState("")
-  const [focusPrompt, setFocusPrompt] = useState(false)
-  const [focusFile, setFocusFile] = useState(false)
-  const [focusTool, setFocusTool] = useState(false)
-  const [focusAssistant, setFocusAssistant] = useState(false)
-  const [atCommand, setAtCommand] = useState("")
-  const [isAssistantPickerOpen, setIsAssistantPickerOpen] = useState(false)
+  const [isPromptPickerOpen, setIsPromptPickerOpen] = useState(false);
+  const [slashCommand, setSlashCommand] = useState("");
+  const [isFilePickerOpen, setIsFilePickerOpen] = useState(false);
+  const [hashtagCommand, setHashtagCommand] = useState("");
+  const [isToolPickerOpen, setIsToolPickerOpen] = useState(false);
+  const [toolCommand, setToolCommand] = useState("");
+  const [focusPrompt, setFocusPrompt] = useState(false);
+  const [focusFile, setFocusFile] = useState(false);
+  const [focusTool, setFocusTool] = useState(false);
+  const [focusAssistant, setFocusAssistant] = useState(false);
+  const [atCommand, setAtCommand] = useState("");
+  const [isAssistantPickerOpen, setIsAssistantPickerOpen] = useState(false);
 
   // ATTACHMENTS STORE
-  const [chatFiles, setChatFiles] = useState<ChatFile[]>([])
-  const [chatImages, setChatImages] = useState<MessageImage[]>([])
-  const [newMessageFiles, setNewMessageFiles] = useState<ChatFile[]>([])
-  const [newMessageImages, setNewMessageImages] = useState<MessageImage[]>([])
-  const [showFilesDisplay, setShowFilesDisplay] = useState<boolean>(false)
+  const [chatFiles, setChatFiles] = useState<ChatFile[]>([]);
+  const [chatImages, setChatImages] = useState<MessageImage[]>([]);
+  const [newMessageFiles, setNewMessageFiles] = useState<ChatFile[]>([]);
+  const [newMessageImages, setNewMessageImages] = useState<MessageImage[]>([]);
+  const [showFilesDisplay, setShowFilesDisplay] = useState<boolean>(false);
 
-  // RETIEVAL STORE
-  const [useRetrieval, setUseRetrieval] = useState<boolean>(true)
-  const [sourceCount, setSourceCount] = useState<number>(4)
+  // RETRIEVAL STORE
+  const [useRetrieval, setUseRetrieval] = useState<boolean>(true);
+  const [sourceCount, setSourceCount] = useState<number>(4);
 
   // TOOL STORE
-  const [selectedTools, setSelectedTools] = useState<Tables<"tools">[]>([])
-  const [toolInUse, setToolInUse] = useState<string>("none")
+  const [selectedTools, setSelectedTools] = useState<Tables<"tools">[]>([]);
+  const [toolInUse, setToolInUse] = useState<string>("none");
 
   useEffect(() => {
-    ;(async () => {
-      const profile = await fetchStartingData()
+    (async () => {
+      const profile = await fetchStartingData();
 
       if (profile) {
-        const hostedModelRes = await fetchHostedModels(profile)
-        if (!hostedModelRes) return
+        const hostedModelRes = await fetchHostedModels(profile);
+        if (!hostedModelRes) return;
 
-        setEnvKeyMap(hostedModelRes.envKeyMap)
-        setAvailableHostedModels(hostedModelRes.hostedModels)
+        setEnvKeyMap(hostedModelRes.envKeyMap);
+        setAvailableHostedModels(hostedModelRes.hostedModels);
 
         if (
           profile["openrouter_api_key"] ||
           hostedModelRes.envKeyMap["openrouter"]
         ) {
-          const openRouterModels = await fetchOpenRouterModels()
-          if (!openRouterModels) return
-          setAvailableOpenRouterModels(openRouterModels)
+          const openRouterModels = await fetchOpenRouterModels();
+          if (!openRouterModels) return;
+          setAvailableOpenRouterModels(openRouterModels);
         }
       }
 
       if (process.env.NEXT_PUBLIC_OLLAMA_URL) {
-        const localModels = await fetchOllamaModels()
-        if (!localModels) return
-        setAvailableLocalModels(localModels)
+        const localModels = await fetchOllamaModels();
+        if (!localModels) return;
+        setAvailableLocalModels(localModels);
       }
-    })()
-  }, [])
+    })();
+  }, []);
 
   const fetchStartingData = async () => {
-    const session = (await supabase.auth.getSession()).data.session
+    const session = (await supabase.auth.getSession()).data.session;
 
     if (session) {
-      const user = session.user
+      const user = session.user;
 
-      const profile = await getProfileByUserId(user.id)
-      setProfile(profile)
+      const profile = await getProfileByUserId(user.id);
+      setProfile(profile);
 
       if (!profile.has_onboarded) {
-        return router.push("/setup")
+        return router.push("/setup");
       }
 
       try {
-        const workspaces = await getWorkspacesByUserId(user.id)
-        setWorkspaces(workspaces)
+        const workspaces = await getWorkspacesByUserId(user.id);
+        setWorkspaces(workspaces);
 
         // Initialize an array to collect all connections from workspaces
-        let allWorkspaceConnections: ConnectionType[] = []
+        let allWorkspaceConnections: any[] =[];
 
         for (const workspace of workspaces) {
-          console.log("Fetching connections for workspace:", workspace.id)
+          console.log("Fetching connections for workspace:", workspace.id);
 
           // Fetch connections for the current workspace
           try {
-            const workspaceConnections =
-              await getConnectionWorkspacesByWorkspaceId(workspace.id)
+            const workspaceConnections = await getConnectionWorkspacesByWorkspaceId(workspace.id);
             console.log(
               "Connections for workspace",
               workspace.id,
               ":",
               workspaceConnections.connections
-            )
+            );
             // Add the fetched connections to the array
             allWorkspaceConnections = [
               ...allWorkspaceConnections,
               ...workspaceConnections.connections
-            ]
+            ];
           } catch (error) {
             console.error(
               "Error fetching connections for workspace:",
               workspace.id,
               error
-            )
+            );
           }
 
           // Fetch other data related to the workspace (e.g., images)
-          let workspaceImageUrl = ""
+          let workspaceImageUrl = "";
 
           if (workspace.image_path) {
             workspaceImageUrl =
-              (await getWorkspaceImageFromStorage(workspace.image_path)) || ""
+              (await getWorkspaceImageFromStorage(workspace.image_path)) || "";
           }
 
           if (workspaceImageUrl) {
-            const response = await fetch(workspaceImageUrl)
-            const blob = await response.blob()
-            const base64 = await convertBlobToBase64(blob)
+            const response = await fetch(workspaceImageUrl);
+            const blob = await response.blob();
+            const base64 = await convertBlobToBase64(blob);
 
             // Update only the workspace images list with the fetched image data
-            setWorkspaceImages(prev => [
+            setWorkspaceImages((prev: any) => [
               ...prev,
               {
                 workspaceId: workspace.id,
@@ -227,20 +219,20 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
                 base64: base64,
                 url: workspaceImageUrl
               }
-            ])
+            ]);
           }
         }
 
         // Update the connections state after fetching all connections
-        setConnections(allWorkspaceConnections)
+        setConnections(allWorkspaceConnections);
 
-        return profile
+        return profile;
       } catch (error) {
-        console.error("Error fetching workspaces:", error)
+        console.error("Error fetching workspaces:", error);
         // Handle error fetching workspaces
       }
     }
-  }
+  };
 
   return (
     <ChatbotUIContext.Provider
@@ -378,5 +370,6 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
     >
       {children}
     </ChatbotUIContext.Provider>
-  )
-}
+  );
+};
+

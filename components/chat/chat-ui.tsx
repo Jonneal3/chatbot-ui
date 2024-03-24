@@ -187,7 +187,7 @@ export const ChatUI: FC<ChatUIProps> = ({}) => {
   }
 
   return (
-    <div className="bg-base relative flex h-full flex-col items-center">
+    <div className="bg-base-300 relative flex h-full flex-col items-center">
       <div className="absolute left-4 top-2.5 flex justify-center">
         <ChatScrollButtons
           isAtTop={isAtTop}

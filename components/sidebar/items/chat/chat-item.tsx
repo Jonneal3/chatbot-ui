@@ -1,3 +1,4 @@
+/* eslint-disable tailwindcss/migration-from-tailwind-2 */
 import { ModelIcon } from "@/components/models/model-icon"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ChatbotUIContext } from "@/context/context"
@@ -57,8 +58,8 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     <div
       ref={itemRef}
       className={cn(
-        "hover:bg-secondary hover:text-primary-content focus:bg-secondary group flex w-full cursor-pointer items-center rounded p-2 hover:bg-opacity-70 focus:outline-none",
-        isActive && "bg-primary text-primary-content"
+        "hover:bg-base-100 hover:text-base-content focus:bg-base group flex w-full cursor-pointer items-center rounded p-2 hover:bg-opacity-70 focus:outline-none",
+        isActive && "bg-base-100 text-base-content"
       )}
       tabIndex={0}
       onKeyDown={handleKeyDown}
@@ -76,7 +77,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           />
         ) : (
           <IconRobotFace
-            className="bg-secondary text-secondary-content rounded-full border-DEFAULT border-none p-1"
+            className="bg-base-100 text-base-content rounded-full border-DEFAULT border-none p-1"
             size={30}
           />
         )

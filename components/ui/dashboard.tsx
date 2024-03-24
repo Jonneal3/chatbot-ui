@@ -87,7 +87,8 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
       </Button>
 
       <div
-        className={cn("border-r-2 duration-200 dark:border-none")}
+        // eslint-disable-next-line tailwindcss/classnames-order
+        className={cn("border-none duration-200")}
         style={{
           // Sidebar
           minWidth: showSidebar ? `${SIDEBAR_WIDTH}px` : "0px",

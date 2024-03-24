@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import { buildFinalMessages } from "@/lib/build-prompt"
-import { ChatMessage, ChatPayload, ChatSettings } from "@/types"
+import { ChatMessage, ChatPayload, ChatSettings, ModelProvider } from "@/types"
 import { LLMID } from "@/types/llms"
 import { MessageImage } from "@/types/images/message-image"
 import { getAssistantCollectionsByAssistantId } from "@/db/assistant-collections"
@@ -7,11 +8,27 @@ import { getAssistantFilesByAssistantId } from "@/db/assistant-files"
 import { getAssistantToolsByAssistantId } from "@/db/assistant-tools"
 import { getCollectionFilesByCollectionId } from "@/db/collection-files"
 import { getMessagesByChatId } from "@/db/messages" // Import the function to retrieve messages by chat ID
-import { getAssistantById } from "@/db/assistants"
+import { getAssistantById, getAssistantWorkspacesByAssistantId } from "@/db/assistants"
 import { createMessage } from "@/db/messages"
 import { handleRetrieval } from "@/lib/api/retrieval-index"
 import { tools } from "@/lib/api/tools"
 import { getProfileByUserId } from "@/db/profile"
+import { fetchHostedModels, fetchOpenRouterModels } from "@/lib/models/api/fetch-models";
+import { OpenRouterLLM, LLM } from "@/types";
+import { LLM_LIST } from "@/lib/models/llm/llm-list"
+import { Dispatch, SetStateAction } from "react"
+import { Tables } from "@/supabase/types"
+import { handleHostedChat } from "@/components/chat/chat-helpers/api/index"
+import { getModelWorkspacesByWorkspaceId } from "@/db/models"
+import { VALID_ENV_KEYS } from "@/types/valid-keys";
+
+
+const isRegeneration: boolean = false;
+const newAbortController: AbortController = new AbortController();
+const newMessageImages: MessageImage[] = [];
+const setChatMessages: Dispatch<SetStateAction<ChatMessage[]>> = () => []; // Placeholder function
+const setToolInUse: Dispatch<SetStateAction<string>> = () => []; // Placeholder function
+
 
 export const runFunction = async (
   assistant_id: any,
@@ -21,8 +38,9 @@ export const runFunction = async (
 ) => {
   // Assistant
   const assistant = await getAssistantById(assistant_id)
+  const profile = await getProfileByUserId(user_id)
 
-  console.log(assistant)
+  console.log("assistant",assistant)
 
   // Add Message
   const message = await createMessage({
@@ -39,39 +57,96 @@ export const runFunction = async (
 
   const model = assistant.model as LLMID
 
-  // Tools
-  const assistantTools = (await getAssistantToolsByAssistantId(assistant_id))
-    .tools
-  console.log("Tools", "tools")
+    // GET MODELS
+    const workspace = await getAssistantWorkspacesByAssistantId(assistant_id);
+    const workspaceModels = await getModelWorkspacesByWorkspaceId(workspace.workspaces[0].id);
+    const models = workspaceModels.models;
 
-  // Files
-  let allFiles = []
+    console.log('models',models)
 
-  const assistantFiles = (await getAssistantFilesByAssistantId(assistant_id))
-    .files
-  allFiles = [...assistantFiles]
-  const assistantCollections = (
-    await getAssistantCollectionsByAssistantId(assistant_id)
-  ).collections
-  for (const collection of assistantCollections) {
-    const collectionFiles = (
-      await getCollectionFilesByCollectionId(collection.id)
-    ).files
-    allFiles = [...allFiles, ...collectionFiles]
-  }
+          // Initialize state for available local models
+      const envKeyMap: Record<string, VALID_ENV_KEYS> = {};
+      const availableHostedModels: LLM[] = [];
+      const availableLocalModels: LLM[] = [];
+      const availableOpenRouterModels: OpenRouterLLM[] = [];
 
-  console.log("All Files", "tools")
+      console.log("Initialized variables: ");
+      console.log("envKeyMap:", envKeyMap);
+      console.log("availableHostedModels:", availableHostedModels);
+      console.log("availableLocalModels:", availableLocalModels);
+      console.log("availableOpenRouterModels:", availableOpenRouterModels);
 
-  const selectedTools = assistantTools
-  const setChatFiles = allFiles.map(file => ({
-    id: file.id,
-    name: file.name,
-    type: file.type,
-    file: null
-  }))
+      if (profile) {
+        console.log('profile found'
+)
+        const hostedModelRes = await fetchHostedModels(profile);
+        if (!hostedModelRes) return;
+
+        console.log('hosted_models',hostedModelRes)
+
+        // Assign values to the declared variables directly
+        Object.assign(envKeyMap, hostedModelRes.envKeyMap);
+        availableHostedModels.push(...hostedModelRes.hostedModels);
+
+        console.log("After fetching hosted models: ");
+
+        if (profile["openrouter_api_key"] || hostedModelRes.envKeyMap["openrouter"]) {
+          const openRouterModels = await fetchOpenRouterModels();
+          if (!openRouterModels) return;
+
+          // Ensure each model conforms to the OpenRouterLLM interface before pushing to the array
+          openRouterModels.forEach((model: any) => {
+            const formattedModel: OpenRouterLLM = {
+              modelId: model.modelId,
+              modelName: model.modelName,
+              provider: model.provider,
+              hostedId: model.hostedId,
+              platformLink: model.platformLink,
+              imageInput: model.imageInput,
+              maxContext: model.maxContext // Additional property for OpenRouterLLM
+            };
+            availableOpenRouterModels.push(formattedModel);
+          });
+
+          console.log("After fetching open router models: ");
+          console.log("availableOpenRouterModels:", availableOpenRouterModels);
+        }
+      }
+
+    // Tools
+    const assistantTools = (await getAssistantToolsByAssistantId(assistant_id))
+      .tools
+    console.log("Tools", "tools")
+
+    // Files
+    let allFiles = []
+
+    const assistantFiles = (await getAssistantFilesByAssistantId(assistant_id))
+      .files
+    allFiles = [...assistantFiles]
+    const assistantCollections = (
+      await getAssistantCollectionsByAssistantId(assistant_id)
+    ).collections
+    for (const collection of assistantCollections) {
+      const collectionFiles = (
+        await getCollectionFilesByCollectionId(collection.id)
+      ).files
+      allFiles = [...allFiles, ...collectionFiles]
+    }
+
+    console.log("All Files", "tools")
+
+    const selectedTools = assistantTools
+    const setChatFiles = allFiles.map(file => ({
+      id: file.id,
+      name: file.name,
+      type: file.type,
+      file: null
+    }))
 
   console.log("Chat Files", "files")
   console.log("Selected Tools", "files")
+
 
   // Extract chatSettings from assistant
   const chatSettings: ChatSettings | null = assistant
@@ -86,11 +161,39 @@ export const runFunction = async (
       }
     : null
 
-  console.log("Chat Settings", "files")
+      // GET MODELS API
+      const modelData = [
+        ...models.map((model: {
+          api_key: string;
+          base_url: string;
+          context_length: number;
+          created_at: string;
+          description: string;
+          folder_id: string | null;
+          id: string;
+          model_id: string;
+          name: string;
+          sharing: string;
+          updated_at: string | null;
+          user_id: string;
+        }) => ({
+          modelId: model.model_id as LLMID,
+          modelName: model.name,
+          provider: "custom" as ModelProvider,
+          hostedId: model.id,
+          platformLink: "",
+          imageInput: false
+        })),
+        ...LLM_LIST,
+        ...availableLocalModels,
+        ...availableOpenRouterModels
+      ].find(llm => llm.modelId === chatSettings?.model);
+
+      console.log("Final model data:", modelData);
+      console.log("Chat Settings", "files")
 
   // Retrieve the items from the knowledge
   const userInput: string = content
-  const profile = await getProfileByUserId(user_id)
   const rawMessages = await getMessagesByChatId(chat_id) // Retrieve messages by chat ID
 
   // Format raw messages to match the ChatMessage interface
@@ -116,8 +219,6 @@ export const runFunction = async (
   const chatImages: MessageImage[] = []
   const sourceCount = 1
 
-  console.log("Chat Messages", chatMessages)
-
   const retrievedFileItems = await handleRetrieval(
     userInput,
     [],
@@ -141,6 +242,8 @@ export const runFunction = async (
 
   console.log("payload complete")
 
+  let generatedText = ""
+
   // Make a tools request
   if (selectedTools.length > 0 && payload.chatSettings) {
     const formattedMessages = await buildFinalMessages(
@@ -149,7 +252,7 @@ export const runFunction = async (
       chatImages
     )
 
-    console.log("user_id", "userId")
+    console.log("user_id-main", user_id)
 
     const requestBody = {
       user_id,
@@ -161,17 +264,47 @@ export const runFunction = async (
     }
 
     const response = await tools(
-      requestBody.user_id,
       assistant_id,
+      requestBody.user_id,
       requestBody.body,
       chat_id,
       model
     )
 
-    console.log("response FINAL", response)
+     generatedText = response 
 
-    return response // Return the allFiles array
+    console.log("response FINAL", response)
   }
+  // MAKE A NON-TOOL RELATED CHAT REQUEST
+  else {
+    const hostedChatResponse = await handleHostedChat(
+      payload,
+      profile!,
+      modelData!,
+      isRegeneration,
+      newAbortController,
+      newMessageImages,
+      chatImages,
+      setChatMessages,
+      setToolInUse,
+    );
+  
+    generatedText = hostedChatResponse.response;
+
+    const message2 = await createMessage({
+      chat_id: chat_id,
+      assistant_id: assistant_id,
+      user_id: user_id,
+      content: hostedChatResponse.response.choices[0].message.content || "",
+      role: "assistant",
+      image_paths: [],
+      model: model,
+      sequence_number: 1
+    })
+
+  }
+  
+  return generatedText;
 }
 
 export default runFunction

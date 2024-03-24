@@ -13,7 +13,14 @@ export const fetchHostedModels = async (profile: Tables<"profiles">) => {
       providers.push("openai")
     }
 
-    const response = await fetch("/api/keys")
+    //
+    console.log('profile_model', profile)
+
+    const response = await fetch(`/api/keys`);
+
+    //
+
+    console.log('fetch api keys', response)
 
     if (!response.ok) {
       throw new Error(`Server is not responding.`)

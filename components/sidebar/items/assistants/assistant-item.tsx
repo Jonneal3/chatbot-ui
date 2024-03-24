@@ -120,7 +120,7 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
           />
         ) : (
           <IconRobotFace
-            className="bg-secondary text-primary-content rounded-full border-DEFAULT border-none p-1"
+            className="bg-base-100 text-primary-content rounded-full border-DEFAULT border-none p-1"
             size={30}
           />
         )

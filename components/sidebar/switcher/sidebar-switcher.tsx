@@ -28,7 +28,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   onContentTypeChange
 }) => {
   return (
-    <div className="border-base-100 bg-base-300 flex flex-col justify-between border-r pb-5">
+    <div className="border-base-100 bg-base-300 flex flex-col justify-between border-r px-2 pb-5">
       <TabsList className="bg-background grid h-[300px] grid-rows-9">
         <SidebarSwitchItem
           icon={<IconMessages size={SIDEBAR_ICON_SIZE} />}
@@ -85,14 +85,16 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         />
       </TabsList>
 
-      <div className="flex flex-col items-center space-y-4">
+      <div className="grid h-[75px] grid-rows-2">
         {/* TODO */}
         {/* <WithTooltip display={<div>Import</div>} trigger={<Import />} /> */}
 
         {/* TODO */}
         {/* <Alerts /> */}
 
-        <WithTooltip display={<div>Billing</div>} trigger={<Account />} />
+        <WithTooltip 
+          display={<div>Billing</div>} 
+          trigger={<Account />} />
 
         <WithTooltip
           display={<div>Profile Settings</div>}

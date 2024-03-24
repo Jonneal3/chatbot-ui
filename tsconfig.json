@@ -21,7 +21,7 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@styles/*": ["./styles/*"]
+      "@styles/*": ["./styles/*"],
     }    
   },
   "include": [

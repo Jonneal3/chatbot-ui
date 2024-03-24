@@ -2,7 +2,7 @@ import { openapiToFunctions } from "@/lib/openapi-conversion"
 import {
   checkApiKey,
   getServerProfile
-} from "@/lib/server/api-chat-helpers/api-chat-helper.ts"
+} from "@/lib/server/serverless-chat-helpers"
 import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import OpenAI from "openai"
@@ -32,6 +32,8 @@ export async function tools(
     messages: any[]
     selectedTools: Tables<"tools">[]
   }
+
+  console.log("user_id_2",user_id)
 
   try {
     const profile = await getServerProfile(user_id)
@@ -328,7 +330,7 @@ export async function tools(
 
     console.log(message2)
 
-    return message2
+    return secondResponse
   } catch (error: any) {
     console.error(error)
     const errorMessage = error.error?.message || "An unexpected error occurred"

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { ChatbotUIContext } from "@/context/context"
 import {
   PROFILE_CONTEXT_MAX,
@@ -43,7 +42,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
 import { TextareaAutosize } from "../ui/textarea-autosize"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ThemeSwitcher } from "./theme-switcher"
-import { ThemeChange } from "./theme-change"
 
 interface ProfileSettingsProps {}
 
@@ -731,7 +729,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
         <div className="mt-6 flex items-center">
           <div className="flex items-center space-x-1">
-            <ThemeChange />
+            <ThemeSwitcher />
 
             <WithTooltip
               display={

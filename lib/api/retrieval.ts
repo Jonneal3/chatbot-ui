@@ -1,7 +1,7 @@
 import {
   checkApiKey,
   getServerProfile
-} from "@/lib/server/api-chat-helpers/api-chat-helper.ts"
+} from "@/lib/server/serverless-chat-helpers"
 import { Database } from "@/supabase/types"
 import { createClient } from "@supabase/supabase-js"
 import OpenAI from "openai"

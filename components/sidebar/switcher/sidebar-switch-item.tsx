@@ -22,7 +22,7 @@ export const SidebarSwitchItem: FC<SidebarSwitchItemProps> = ({
       }
       trigger={
         <TabsTrigger
-          className="hover:bg-accent rounded hover:bg-opacity-50"
+          className="hover:bg-base-100 hover:text-base-content rounded-lg"
           value={contentType}
           onClick={() => onContentTypeChange(contentType as ContentType)}
         >

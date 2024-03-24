@@ -181,7 +181,7 @@ export const Message: FC<MessageProps> = ({
 
   return (
     <div
-      className={cn("bg-base flex w-full justify-center")}
+      className={cn("bg-base-300 flex w-full justify-center")}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       onKeyDown={handleKeyDown}
@@ -245,7 +245,7 @@ export const Message: FC<MessageProps> = ({
                 />
               ) : (
                 <IconUserCircle
-                  className="bg-primary text-neutral border-primary rounded-full border-DEFAULT p-1"
+                  className="bg-base-100 text-neutral-content border-neutral-content rounded-full border-DEFAULT p-1"
                   size={ICON_SIZE}
                 />
               )}
