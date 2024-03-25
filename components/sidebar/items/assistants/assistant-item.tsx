@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-duplicate-props */
 import { ChatSettingsForm } from "@/components/ui/chat-settings-form"
 import ImagePicker from "@/components/ui/image-picker"
 import { Input } from "@/components/ui/input"
