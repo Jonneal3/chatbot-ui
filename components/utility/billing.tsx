@@ -6,7 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet"
 import { Button } from "../ui/button"
 import { IconReceipt2 } from "@tabler/icons-react"
 import Image from "next/image" // Import Image from 'next/image'
-import { SIDEBAR_ICON_SIZE } from "../sidebar/switcher/sidebar-switcher"
+import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 
 interface ProfileSettingsProps {}
 

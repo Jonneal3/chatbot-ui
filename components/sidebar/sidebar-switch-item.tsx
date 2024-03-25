@@ -1,8 +1,8 @@
 /* eslint-disable tailwindcss/migration-from-tailwind-2 */
 import { ContentType } from "@/types"
 import { FC } from "react"
-import { TabsTrigger } from "../../ui/tabs"
-import { WithTooltip } from "../../ui/with-tooltip"
+import { TabsTrigger } from "../ui/tabs"
+import { WithTooltip } from "../ui/with-tooltip"
 
 interface SidebarSwitchItemProps {
   contentType: ContentType

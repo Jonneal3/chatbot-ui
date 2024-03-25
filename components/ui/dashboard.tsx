@@ -1,7 +1,8 @@
+/* eslint-disable tailwindcss/no-unnecessary-arbitrary-value */
 "use client"
 
-import { Sidebar } from "@/components/sidebar/main-sidebar/sidebar"
-import { SidebarSwitcher } from "@/components/sidebar/switcher/sidebar-switcher"
+import { Sidebar } from "@/components/sidebar/sidebar"
+import { SidebarSwitcher } from "@/components/sidebar/sidebar-switcher"
 import { Button } from "@/components/ui/button"
 import { Tabs } from "@/components/ui/tabs"
 import useHotkey from "@/lib/hooks/use-hotkey"

@@ -12,8 +12,8 @@ import {
   IconSwitchHorizontal
 } from "@tabler/icons-react"
 import { FC } from "react"
-import { TabsList } from "../../ui/tabs"
-import { WithTooltip } from "../../ui/with-tooltip"
+import { TabsList } from "../ui/tabs"
+import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "@/components/utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
 import Account from "@/components/utility/billing"

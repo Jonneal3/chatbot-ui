@@ -7,7 +7,7 @@ import {
 import { Announcement } from "@/types/announcement"
 import { IconExternalLink, IconSpeakerphone } from "@tabler/icons-react"
 import { FC, useEffect, useState } from "react"
-import { SIDEBAR_ICON_SIZE } from "../sidebar/switcher/sidebar-switcher"
+import { SIDEBAR_ICON_SIZE } from "../sidebar/sidebar-switcher"
 
 interface AnnouncementsProps {}
 

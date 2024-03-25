@@ -77,7 +77,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
           />
         ) : (
           <IconRobotFace
-            className="bg-base-100 text-base-content rounded-full border-DEFAULT border-none p-1"
+            className="bg-primary text-secondary border-primary rounded border-DEFAULT p-1"
             size={30}
           />
         )

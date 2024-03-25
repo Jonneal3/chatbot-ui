@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-undef */
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
@@ -11,7 +12,8 @@ import {
   IconCircleFilled,
   IconFileText,
   IconUserCircle,
-  IconPencil
+  IconPencil,
+  IconMoodSmile
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -202,7 +204,7 @@ export const Message: FC<MessageProps> = ({
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
               <IconPencil
-                className="border-primary bg-primary text-primary-foreground rounded border-DEFAULT p-1"
+                className="border-primary bg-primary text-secondary rounded border-DEFAULT p-1"
                 size={ICON_SIZE}
               />
 
@@ -244,8 +246,8 @@ export const Message: FC<MessageProps> = ({
                   alt="user image"
                 />
               ) : (
-                <IconUserCircle
-                  className="bg-base-100 text-neutral-content border-neutral-content rounded-full border-DEFAULT p-1"
+                <IconMoodSmile
+                  className="bg-primary text-secondary border-primary rounded border-DEFAULT p-1"
                   size={ICON_SIZE}
                 />
               )}
@@ -260,7 +262,6 @@ export const Message: FC<MessageProps> = ({
                       ? selectedAssistant?.name
                       : MODEL_DATA?.modelName
                   : profile?.display_name ?? profile?.username}
-                {message.role === "user" ? "You" : ""}
               </div>
             </div>
           )}

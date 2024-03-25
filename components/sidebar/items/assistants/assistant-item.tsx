@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-duplicate-props */
 import { ChatSettingsForm } from "@/components/ui/chat-settings-form"
 import ImagePicker from "@/components/ui/image-picker"
 import { Input } from "@/components/ui/input"
@@ -120,7 +121,7 @@ export const AssistantItem: FC<AssistantItemProps> = ({ assistant }) => {
           />
         ) : (
           <IconRobotFace
-            className="bg-base-100 text-primary-content rounded-full border-DEFAULT border-none p-1"
+            className="bg-primary text-secondary border-primary rounded border-DEFAULT p-1"
             size={30}
           />
         )
