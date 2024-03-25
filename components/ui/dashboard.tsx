@@ -1,4 +1,3 @@
-/* eslint-disable tailwindcss/no-unnecessary-arbitrary-value */
 "use client"
 
 import { Sidebar } from "@/components/sidebar/sidebar"

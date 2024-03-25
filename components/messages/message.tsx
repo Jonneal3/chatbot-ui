@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-undef */
 import { useChatHandler } from "@/components/chat/chat-hooks/use-chat-handler"
 import { ChatbotUIContext } from "@/context/context"
 import { LLM_LIST } from "@/lib/models/llm/llm-list"
@@ -11,9 +10,8 @@ import {
   IconCaretRightFilled,
   IconCircleFilled,
   IconFileText,
-  IconUserCircle,
-  IconPencil,
-  IconMoodSmile
+  IconMoodSmile,
+  IconPencil
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -26,7 +24,7 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { MessageActions } from "./message-actions"
 import { MessageMarkdown } from "./message-markdown"
 
-const ICON_SIZE = 26
+const ICON_SIZE = 32
 
 interface MessageProps {
   message: Tables<"messages">
@@ -126,7 +124,7 @@ export const Message: FC<MessageProps> = ({
       input.focus()
       input.setSelectionRange(input.value.length, input.value.length)
     }
-  }, [isEditing])
+  }, [isEditing, message.content])
 
   const MODEL_DATA = [
     ...models.map(model => ({
@@ -183,7 +181,10 @@ export const Message: FC<MessageProps> = ({
 
   return (
     <div
-      className={cn("bg-base-300 flex w-full justify-center")}
+      className={cn(
+        "flex w-full justify-center",
+        message.role === "user" ? "" : "bg-secondary"
+      )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
       onKeyDown={handleKeyDown}
@@ -211,7 +212,7 @@ export const Message: FC<MessageProps> = ({
               <div className="text-lg font-semibold">Prompt</div>
             </div>
           ) : (
-            <div className="flex items-center space-x-3 rounded-full">
+            <div className="flex items-center space-x-3">
               {message.role === "assistant" ? (
                 messageAssistantImage ? (
                   <Image
@@ -219,7 +220,7 @@ export const Message: FC<MessageProps> = ({
                       width: `${ICON_SIZE}px`,
                       height: `${ICON_SIZE}px`
                     }}
-                    className="rounded-full"
+                    className="rounded"
                     src={messageAssistantImage}
                     alt="assistant image"
                     height={ICON_SIZE}
@@ -239,7 +240,7 @@ export const Message: FC<MessageProps> = ({
                 )
               ) : profile?.image_url ? (
                 <Image
-                  className={`size-[32px] rounded-full`}
+                  className={`size-[32px] rounded`}
                   src={profile?.image_url}
                   height={32}
                   width={32}

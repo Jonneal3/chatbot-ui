@@ -1,4 +1,3 @@
-/* eslint-disable tailwindcss/migration-from-tailwind-2 */
 import { ModelIcon } from "@/components/models/model-icon"
 import { WithTooltip } from "@/components/ui/with-tooltip"
 import { ChatbotUIContext } from "@/context/context"
@@ -58,8 +57,8 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
     <div
       ref={itemRef}
       className={cn(
-        "hover:bg-base-100 hover:text-base-content focus:bg-base group flex w-full cursor-pointer items-center rounded p-2 hover:bg-opacity-70 focus:outline-none",
-        isActive && "bg-base-100 text-base-content"
+        "hover:bg-accent focus:bg-accent group flex w-full cursor-pointer items-center rounded p-2 hover:opacity-50 focus:outline-none",
+        isActive && "bg-accent"
       )}
       tabIndex={0}
       onKeyDown={handleKeyDown}
@@ -69,7 +68,7 @@ export const ChatItem: FC<ChatItemProps> = ({ chat }) => {
         assistantImage ? (
           <Image
             style={{ width: "30px", height: "30px" }}
-            className="rounded-full"
+            className="rounded"
             src={assistantImage}
             alt="Assistant image"
             width={30}
