@@ -24,7 +24,7 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { MessageActions } from "./message-actions"
 import { MessageMarkdown } from "./message-markdown"
 
-const ICON_SIZE = 32
+const ICON_SIZE = 26
 
 interface MessageProps {
   message: Tables<"messages">
@@ -205,7 +205,7 @@ export const Message: FC<MessageProps> = ({
           {message.role === "system" ? (
             <div className="flex items-center space-x-4">
               <IconPencil
-                className="border-primary bg-primary text-secondary rounded border-DEFAULT p-1"
+                className="border-primary bg-primary text-secondary rounded-full border-DEFAULT p-1"
                 size={ICON_SIZE}
               />
 
@@ -220,7 +220,7 @@ export const Message: FC<MessageProps> = ({
                       width: `${ICON_SIZE}px`,
                       height: `${ICON_SIZE}px`
                     }}
-                    className="rounded"
+                    className="rounded-full"
                     src={messageAssistantImage}
                     alt="assistant image"
                     height={ICON_SIZE}
@@ -248,7 +248,7 @@ export const Message: FC<MessageProps> = ({
                 />
               ) : (
                 <IconMoodSmile
-                  className="bg-primary text-secondary border-primary rounded border-DEFAULT p-1"
+                  className="bg-primary text-secondary border-primary rounded-full border-DEFAULT p-1"
                   size={ICON_SIZE}
                 />
               )}

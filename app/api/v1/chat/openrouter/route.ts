@@ -1,24 +1,22 @@
-import {
-  checkApiKey,
-  getServerProfile
-} from "@/lib/server/serverless-chat-helpers"
+import { checkApiKey, getServerProfile } from "@/lib/server/server-chat-helpers"
 import { ChatSettings } from "@/types"
+import { OpenAIStream, StreamingTextResponse } from "ai"
 import { ServerRuntime } from "next"
 import OpenAI from "openai"
-import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions"
+import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions.mjs"
 
 export const runtime: ServerRuntime = "edge"
 
 export async function POST(request: Request) {
   const json = await request.json()
-  const { chatSettings, user_id, messages } = json as {
+  const { chatSettings, messages } = json as {
     chatSettings: ChatSettings
-    user_id: any
     messages: any[]
+    user_id: any
   }
 
   try {
-    const profile = await getServerProfile(user_id)
+    const profile = await getServerProfile()
 
     checkApiKey(profile.openrouter_api_key, "OpenRouter")
 
@@ -35,8 +33,10 @@ export async function POST(request: Request) {
       stream: false
     })
 
-    // Respond with the stream
-    return response
+    return new Response(JSON.stringify(response), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    })
   } catch (error: any) {
     let errorMessage = error.message || "An unexpected error occurred"
     const errorCode = error.status || 500
@@ -47,7 +47,8 @@ export async function POST(request: Request) {
     }
 
     return new Response(JSON.stringify({ message: errorMessage }), {
-      status: errorCode
+      status: errorCode,
+      headers: { "Content-Type": "application/json" }
     })
   }
 }

@@ -1,7 +1,7 @@
 /* eslint-disable tailwindcss/migration-from-tailwind-2 */
 "use client"
 
-import Button from "@/components/ui/Button/Button"
+import { Button } from "@/components/ui/button"
 import type { Tables } from "@/supabase/types"
 import { getStripe } from "@/stripe/client"
 import { checkoutWithStripe } from "@/stripe/server"
@@ -181,7 +181,7 @@ export default function Pricing({ user, products, subscription }: Props) {
                       </span>
                     </p>
                     <Button
-                      variant="slim"
+                      variant="default"
                       type="button"
                       loading={priceIdLoading === price.id}
                       onClick={() => handleStripeCheckout(price)}

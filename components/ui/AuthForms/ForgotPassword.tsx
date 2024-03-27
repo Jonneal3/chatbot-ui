@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client"
 
-import Button from "@/components/ui/Button"
+import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { requestPasswordUpdate } from "@/utils/auth-helpers/server"
 import { handleRequest } from "@/utils/auth-helpers/client"
@@ -48,7 +48,7 @@ export default function ForgotPassword({
             />
           </div>
           <Button
-            variant="slim"
+            variant="default"
             type="submit"
             className="mt-1"
             loading={isSubmitting}

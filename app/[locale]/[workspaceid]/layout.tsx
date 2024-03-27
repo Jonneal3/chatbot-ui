@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 import { Dashboard } from "@/components/ui/dashboard"
@@ -12,6 +13,7 @@ import { getPresetWorkspacesByWorkspaceId } from "@/db/presets"
 import { getPromptWorkspacesByWorkspaceId } from "@/db/prompts"
 import { getAssistantImageFromStorage } from "@/db/storage/assistant-images"
 import { getToolWorkspacesByWorkspaceId } from "@/db/tools"
+import { getConnectionWorkspacesByWorkspaceId } from "@/db/connections"
 import { getWorkspaceById } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { supabase } from "@/lib/supabase/browser-client"
@@ -42,6 +44,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setPrompts,
     setTools,
     setModels,
+    setConnections,
     selectedWorkspace,
     setSelectedWorkspace,
     setSelectedChat,
@@ -154,6 +157,10 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
     const modelData = await getModelWorkspacesByWorkspaceId(workspaceId)
     setModels(modelData.models)
+
+    const connectionData =
+      await getConnectionWorkspacesByWorkspaceId(workspaceId)
+    setConnections(connectionData.connections)
 
     setChatSettings({
       model: (workspace?.default_model || "gpt-4-1106-preview") as LLMID,

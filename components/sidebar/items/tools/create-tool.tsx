@@ -3,7 +3,6 @@
 import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
 import { ChatbotUIContext } from "@/context/context"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
@@ -254,29 +253,6 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
               onValueChange={setSchema}
               minRows={15}
             />
-          </div>
-
-          <div className="space-y-1">
-            <Label>Request in...</Label>
-            <Tabs
-              defaultValue={isRequestInBody ? "body" : "url"}
-              className="w-[400px]"
-            >
-              <TabsList>
-                <TabsTrigger
-                  value="body"
-                  onClick={() => setIsRequestInBody(true)}
-                >
-                  Body
-                </TabsTrigger>
-                <TabsTrigger
-                  value="url"
-                  onClick={() => setIsRequestInBody(false)}
-                >
-                  URL
-                </TabsTrigger>
-              </TabsList>
-            </Tabs>
           </div>
         </>
       )}

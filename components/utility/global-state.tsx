@@ -172,73 +172,35 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         return router.push("/setup")
       }
 
-      try {
-        const workspaces = await getWorkspacesByUserId(user.id)
-        setWorkspaces(workspaces)
+      const workspaces = await getWorkspacesByUserId(user.id)
+      setWorkspaces(workspaces)
 
-        // Initialize an array to collect all connections from workspaces
-        let allWorkspaceConnections: any[] = []
+      for (const workspace of workspaces) {
+        let workspaceImageUrl = ""
 
-        for (const workspace of workspaces) {
-          console.log("Fetching connections for workspace:", workspace.id)
-
-          // Fetch connections for the current workspace
-          try {
-            const workspaceConnections =
-              await getConnectionWorkspacesByWorkspaceId(workspace.id)
-            console.log(
-              "Connections for workspace",
-              workspace.id,
-              ":",
-              workspaceConnections.connections
-            )
-            // Add the fetched connections to the array
-            allWorkspaceConnections = [
-              ...allWorkspaceConnections,
-              ...workspaceConnections.connections
-            ]
-          } catch (error) {
-            console.error(
-              "Error fetching connections for workspace:",
-              workspace.id,
-              error
-            )
-          }
-
-          // Fetch other data related to the workspace (e.g., images)
-          let workspaceImageUrl = ""
-
-          if (workspace.image_path) {
-            workspaceImageUrl =
-              (await getWorkspaceImageFromStorage(workspace.image_path)) || ""
-          }
-
-          if (workspaceImageUrl) {
-            const response = await fetch(workspaceImageUrl)
-            const blob = await response.blob()
-            const base64 = await convertBlobToBase64(blob)
-
-            // Update only the workspace images list with the fetched image data
-            setWorkspaceImages((prev: any) => [
-              ...prev,
-              {
-                workspaceId: workspace.id,
-                path: workspace.image_path,
-                base64: base64,
-                url: workspaceImageUrl
-              }
-            ])
-          }
+        if (workspace.image_path) {
+          workspaceImageUrl =
+            (await getWorkspaceImageFromStorage(workspace.image_path)) || ""
         }
 
-        // Update the connections state after fetching all connections
-        setConnections(allWorkspaceConnections)
+        if (workspaceImageUrl) {
+          const response = await fetch(workspaceImageUrl)
+          const blob = await response.blob()
+          const base64 = await convertBlobToBase64(blob)
 
-        return profile
-      } catch (error) {
-        console.error("Error fetching workspaces:", error)
-        // Handle error fetching workspaces
+          setWorkspaceImages(prev => [
+            ...prev,
+            {
+              workspaceId: workspace.id,
+              path: workspace.image_path,
+              base64: base64,
+              url: workspaceImageUrl
+            }
+          ])
+        }
       }
+
+      return profile
     }
   }
 

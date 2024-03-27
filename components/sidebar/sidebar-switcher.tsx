@@ -17,6 +17,8 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "@/components/utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
 import Account from "@/components/utility/billing"
+import logo from "@/public/icon-192x192.png"
+import { ChatbotUISVG } from "../icons/chatbotui-svg"
 
 export const SIDEBAR_ICON_SIZE = 20
 
@@ -29,7 +31,13 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
 }) => {
   return (
     <div className="border-base-100 bg-base-300 flex flex-col justify-between border-r px-2 pb-5">
-      <TabsList className="bg-background grid h-[300px] grid-rows-9">
+      <TabsList className="bg-background grid h-[300px] grid-rows-10">
+        <SidebarSwitchItem
+          icon={<ChatbotUISVG theme="dark" scale={0.09} />} // Adjust theme and scale as needed
+          contentType="chats"
+          onContentTypeChange={onContentTypeChange}
+        />
+
         <SidebarSwitchItem
           icon={<IconMessages size={SIDEBAR_ICON_SIZE} />}
           contentType="chats"

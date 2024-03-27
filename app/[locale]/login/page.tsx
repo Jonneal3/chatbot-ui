@@ -33,7 +33,6 @@ export default async function Login({
     }
   )
   const session = (await supabase.auth.getSession()).data.session
-
   if (session) {
     let redirectPath = "/pricing" // Default redirect path
 
@@ -70,6 +69,8 @@ export default async function Login({
   const signIn = async (formData: FormData) => {
     "use server"
 
+    let redirectPath = "/pricing" // Default redirect path
+
     const email = formData.get("email") as string
     const password = formData.get("password") as string
     const cookieStore = cookies()
@@ -84,7 +85,6 @@ export default async function Login({
       return redirect(`/login?message=${error.message}`)
     }
     {
-      let redirectPath = "/pricing" // Default redirect path
       try {
         const subscription = await getSubscriptionsByUserId(data.user.id)
         const { data: homeWorkspace, error: homeWorkspaceError } =

@@ -6,7 +6,7 @@ import {
   IconBolt,
   IconCirclePlus,
   IconPlayerStopFilled,
-  IconSend
+  IconCircleArrowUp
 } from "@tabler/icons-react"
 import Image from "next/image"
 import { FC, useContext, useEffect, useRef, useState } from "react"
@@ -261,9 +261,9 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
               size={30}
             />
           ) : (
-            <IconSend
+            <IconCircleArrowUp
               className={cn(
-                "bg-primary text-secondary rounded p-1",
+                "text-primary rounded bg-none p-1",
                 !userInput && "cursor-not-allowed opacity-50"
               )}
               onClick={() => {
@@ -271,7 +271,7 @@ export const ChatInput: FC<ChatInputProps> = ({}) => {
 
                 handleSendMessage(userInput, chatMessages, false)
               }}
-              size={30}
+              size={34}
             />
           )}
         </div>

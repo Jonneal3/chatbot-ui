@@ -7,7 +7,7 @@ import { Tabs } from "@/components/ui/tabs"
 import useHotkey from "@/lib/hooks/use-hotkey"
 import { cn } from "@/lib/utils"
 import { ContentType } from "@/types"
-import { IconChevronCompactRight } from "@tabler/icons-react"
+import { IconMinusVertical } from "@tabler/icons-react"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FC, useState } from "react"
 import { useSelectFileHandler } from "../chat/chat-hooks/use-select-file-handler"
@@ -125,7 +125,7 @@ export const Dashboard: FC<DashboardProps> = ({ children }) => {
           size="icon"
           onClick={handleToggleSidebar}
         >
-          <IconChevronCompactRight size={24} />
+          <IconMinusVertical size={24} />
         </Button>
       </div>
     </div>
