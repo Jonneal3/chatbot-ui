@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-undef */
 import { ContentType } from "@/types"
 import {
   IconAdjustmentsHorizontal,
