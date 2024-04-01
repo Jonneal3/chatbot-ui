@@ -30,7 +30,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
   onContentTypeChange
 }) => {
   return (
-    <div className="border-base-100 bg-base-300 flex flex-col justify-between border-r px-2 pb-5">
+    <div className="border-base-100 bg-base-300 flex flex-col justify-between border-r px-0 pb-5">
       <TabsList className="bg-background grid h-[300px] grid-rows-10">
         <SidebarSwitchItem
           icon={<ChatbotUISVG theme="dark" scale={0.09} />} // Adjust theme and scale as needed

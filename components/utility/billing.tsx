@@ -59,7 +59,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           <Button size="icon" variant="ghost" onClick={handleToggleSheet}>
             {profile?.image_url ? (
               <Image
-                className="mt-2 size-[34px] cursor-pointer rounded hover:opacity-50"
+                className="mt-2 size-[26px] cursor-pointer rounded hover:opacity-50"
                 src={profile.image_url + "?" + new Date().getTime()}
                 height={34}
                 width={34}

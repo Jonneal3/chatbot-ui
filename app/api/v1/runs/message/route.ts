@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { runFunction } from "@/lib/run-message"
+export const maxDuration = 299 // This function can run for a maximum of 5 seconds
+export const dynamic = "force-dynamic"
 
 // Create a single Supabase client for interacting with your database
 const supabase = createClient(

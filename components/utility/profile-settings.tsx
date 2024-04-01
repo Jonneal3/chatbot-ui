@@ -46,7 +46,7 @@ import { ThemeSwitcher } from "./theme-switcher"
 
 interface ProfileSettingsProps {}
 
-export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
+export const ProfileSettings: FC<ProfileSettingsProps> = async ({}) => {
   const {
     profile,
     setProfile,
@@ -55,6 +55,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     setAvailableOpenRouterModels,
     availableOpenRouterModels
   } = useContext(ChatbotUIContext)
+
+  const id_of_user = profile?.user_id
 
   const router = useRouter()
 
@@ -292,6 +294,28 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     }
   }
 
+  const handleCreateApiKey = async (
+    id_of_user: string,
+    description: string
+  ): Promise<void> => {
+    // Ensure id_of_user is defined
+    if (!id_of_user) {
+      console.error("id_of_user is not defined")
+      return
+    }
+
+    const { error } = await supabase.rpc("create_api_key", {
+      id_of_user,
+      key_description: description
+    })
+    if (error) {
+      console.error("Error creating API key:", error)
+      return
+    }
+
+    // Handle success if needed
+  }
+
   if (!profile) return null
 
   return (
@@ -299,7 +323,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       <SheetTrigger asChild>
         {profile.image_url ? (
           <Image
-            className="mt-2 size-[34px] cursor-pointer rounded hover:opacity-50"
+            className="mt-2 size-[26px] cursor-pointer rounded hover:opacity-50"
             src={profile.image_url + "?" + new Date().getTime()}
             height={34}
             width={34}
@@ -335,9 +359,10 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
           </SheetHeader>
 
           <Tabs defaultValue="profile">
-            <TabsList className="mt-4 grid w-full grid-cols-2">
+            <TabsList className="mt-4 grid w-full grid-cols-3">
               <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="keys">API Keys</TabsTrigger>
+              <TabsTrigger value="model_keys">Model Keys</TabsTrigger>
+              <TabsTrigger value="api_keys">API Keys</TabsTrigger>
             </TabsList>
 
             <TabsContent className="mt-4 space-y-4" value="profile">
@@ -433,7 +458,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
               </div>
             </TabsContent>
 
-            <TabsContent className="mt-4 space-y-4" value="keys">
+            <TabsContent className="mt-4 space-y-4" value="model_keys">
               <div className="mt-5 space-y-2">
                 <Label className="flex items-center">
                   {useAzureOpenai
@@ -725,6 +750,27 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
                 )}
               </div>
             </TabsContent>
+
+            <TabsContent value={"api_keys"}>
+              <div>
+                <Label className="text-xs">Samurai API Key</Label>
+                <Button
+                  className={cn("h-[18px] w-[150px] text-[11px]", "mb-3")}
+                  onClick={() => {
+                    if (id_of_user) {
+                      handleCreateApiKey(
+                        id_of_user,
+                        "Your API Key Description Here"
+                      )
+                    } else {
+                      console.error("id_of_user is undefined")
+                    }
+                  }}
+                >
+                  Create API Key
+                </Button>
+              </div>
+            </TabsContent>
           </Tabs>
         </div>
 
@@ -761,4 +807,11 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
       </SheetContent>
     </Sheet>
   )
+}
+function setCreatingApiKey(arg0: boolean) {
+  throw new Error("Function not implemented.")
+}
+
+function setRevokingApiKey(arg0: boolean) {
+  throw new Error("Function not implemented.")
 }

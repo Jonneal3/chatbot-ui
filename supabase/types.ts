@@ -1865,6 +1865,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_api_key: {
+        Args: {
+          id_of_user: string,
+          key_description: string
+        }
+        Returns: undefined
+      }
       create_duplicate_messages_for_new_chat: {
         Args: {
           old_chat_id: string
@@ -1949,7 +1956,7 @@ export type Database = {
         }
         Returns: boolean
       }
-    }
+    }    
     Enums: {
       pricing_plan_interval: "day" | "week" | "month" | "year"
       pricing_type: "one_time" | "recurring"

@@ -3,43 +3,41 @@ import { createClient } from "@supabase/supabase-js"
 import { runFunction } from "@/lib/run-message"
 import getOauthObject from "@/lib/get-integration"
 import fetch from "node-fetch" // Import node-fetch for making API requests
-
-// Create a single Supabase client for interacting with your database
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import { getProfileByUserId } from "@/db/profile"
+export const maxDuration = 299 // This function can run for a maximum of 5 seconds
+export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
   try {
-    const apiKey = request.headers.get("Authorization")?.split("Bearer ")[1]
+    const user_api_key =
+      request.headers.get("Authorization")?.split(" ")[1] || ""
 
-    console.log("key", apiKey)
-
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "Authorization header with Bearer token is missing" },
-        { status: 401 }
+    if (user_api_key) {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: user_api_key
+            }
+          },
+          auth: {
+            persistSession: false,
+            detectSessionInUrl: false,
+            autoRefreshToken: false
+          }
+        }
       )
     }
 
-    // Query the "api_keys" table to find the user ID associated with the API key
-    const { data: apiKeyData, error: apiKeyError } = await supabase
-      .from("api_keys")
-      .select("*")
-      .eq("id", apiKey)
-      .single()
+    let body = await request.json()
 
-    console.log("api_key_data", apiKeyData)
+    // Extract customData from the body
+    body = body.customData
 
-    if (apiKeyError || !apiKeyData) {
-      return NextResponse.json({ error: "Invalid API key" }, { status: 401 })
-    }
-
-    const user_id = apiKeyData.user_id
-    console.log("USER_ID", user_id)
-
-    const body = await request.json()
+    const profile = getProfileByUserId(body.user_id)
+    const user_id = (await profile).user_id
 
     // Check if all required parameters are present
     const requiredParams: string[] = [
@@ -50,6 +48,7 @@ export async function POST(request: Request) {
       "message_type",
       "content"
     ]
+
     for (const param of requiredParams) {
       if (!(param in body)) {
         return NextResponse.json(
@@ -91,20 +90,7 @@ export async function POST(request: Request) {
 
     console.log("FINAL TOKEN", final_token)
 
-    // Type assertion for runMessage
-    const runMessageData: any = runMessage
-
-    // Extracting content from runMessage
-    let messageContent = ""
-    if (
-      runMessageData &&
-      runMessageData.runMessage &&
-      runMessageData.runMessage.choices &&
-      runMessageData.runMessage.choices.length > 0 &&
-      runMessageData.runMessage.choices[0].message
-    ) {
-      messageContent = runMessageData.runMessage.choices[0].message.content
-    }
+    const messageContent = (runMessage as any)?.choices[0]?.message.content
 
     // Making the additional API request with the obtained token
     const requestBody = {
@@ -129,7 +115,6 @@ export async function POST(request: Request) {
     )
     const apiData = await apiResponse.json()
 
-    console.log(apiResponse)
     console.log(apiData)
 
     // Returning a response with both runMessage and API data
