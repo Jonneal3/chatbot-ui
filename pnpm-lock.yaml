@@ -233,7 +233,7 @@ dependencies:
 
 devDependencies:
   '@next/bundle-analyzer':
-    specifier: ^14.0.2
+    specifier: ^14.1.4
     version: 14.1.4
   '@tailwindcss/typography':
     specifier: ^0.5.10

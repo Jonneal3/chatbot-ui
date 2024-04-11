@@ -54,8 +54,7 @@ export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
     setAvailableHostedModels,
     setAvailableOpenRouterModels,
     availableOpenRouterModels
-  } = useContext(ChatbotUIContext);
-
+  } = useContext(ChatbotUIContext)
 
   const id_of_user = profile?.user_id
 

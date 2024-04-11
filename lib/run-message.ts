@@ -280,6 +280,17 @@ export const runFunction = async (
       model
     )
 
+    const message2 = await createMessage({
+      chat_id: chat_id,
+      assistant_id: assistant_id,
+      user_id: user_id,
+      content: response.choices[0].message.content || "",
+      role: "assistant",
+      image_paths: [],
+      model: model,
+      sequence_number: 1
+    })
+
     generatedText = response
 
     console.log("response FINAL", response)
@@ -297,6 +308,8 @@ export const runFunction = async (
       setChatMessages,
       setToolInUse
     )
+
+    console.log("hosted-response", hostedChatResponse)
 
     generatedText = hostedChatResponse.response
 

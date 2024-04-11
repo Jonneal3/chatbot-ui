@@ -90,6 +90,8 @@ export async function POST(request: Request) {
 
     console.log("FINAL TOKEN", final_token)
 
+    console.log("RUN-MESSAGE", runMessage)
+
     const messageContent = (runMessage as any)?.choices[0]?.message.content
 
     // Making the additional API request with the obtained token

@@ -11,6 +11,7 @@ import { createMessage } from "@/db/messages"
 import { UUID } from "crypto"
 import getOauthObject from "@/lib/get-integration"
 import runPostProcessingFile from "@/lib/post-process"
+import { processBodyContent } from "@/lib/dynamic-chat-vars"
 
 export async function tools(
   assistant_id: string,
@@ -79,7 +80,7 @@ export async function tools(
         post_process: selectedTool.post_process,
         connection_id: selectedTool.connection_id,
         routeMap,
-        request_in_body: selectedTool.request_in_body
+        request_in_body: convertedSchema.routes[0].requestInBody
       })
     }
 
@@ -89,14 +90,23 @@ export async function tools(
       tools: allTools
     })
 
-    console.log("first response", firstResponse)
-
     const message = firstResponse.choices[0].message
-
-    console.log("first response message", message)
     messages.push(message)
-
     const toolCalls = message.tool_calls || []
+
+    console.log("first_response_messages", firstResponse)
+
+    //   if (toolCalls.length === 0) {
+    //   return new Response(message.content, {
+    //     headers: {
+    //       "Content-Type": "application/json"
+    //     }
+    //   })
+    // }
+
+    if (toolCalls.length === 0) {
+      return firstResponse
+    }
 
     if (toolCalls.length > 0) {
       for (const toolCall of toolCalls) {
@@ -202,8 +212,13 @@ export async function tools(
 
           const fullUrl = schemaDetail.url + path
 
-          const bodyContent = parsedArgs.requestBody || parsedArgs
-          console.log("body-content", bodyContent)
+          let bodyContent = parsedArgs.requestBody || parsedArgs
+
+          //UPDATE BODY CONTENT WITH DYNAMIC VARS
+          const processedBody = await processBodyContent(chat_id, bodyContent)
+          bodyContent = processedBody
+
+          console.log("body-content-final", processedBody)
 
           const requestInit = {
             method: "POST",
@@ -307,7 +322,7 @@ export async function tools(
       }
     }
 
-    console.log("messages", messages)
+    console.log("messages tool calL!!!!", messages)
 
     const secondResponse = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
@@ -316,19 +331,6 @@ export async function tools(
     })
 
     console.log("response2", secondResponse.choices[0].message.content)
-
-    const message2 = await createMessage({
-      chat_id: chat_id,
-      assistant_id: assistant_id,
-      user_id: user_id,
-      content: secondResponse.choices[0].message.content || "",
-      role: "assistant",
-      image_paths: [],
-      model: model,
-      sequence_number: 1
-    })
-
-    console.log(message2)
 
     return secondResponse
   } catch (error: any) {

@@ -120,6 +120,8 @@ export async function buildFinalMessages(
     source: "ui"
   }
 
+  console.log("user messages", tempSystemMessage)
+
   finalMessages.unshift(tempSystemMessage)
 
   finalMessages = finalMessages.map(message => {
