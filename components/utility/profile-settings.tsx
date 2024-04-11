@@ -46,7 +46,7 @@ import { ThemeSwitcher } from "./theme-switcher"
 
 interface ProfileSettingsProps {}
 
-export const ProfileSettings: FC<ProfileSettingsProps> = async ({}) => {
+export const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const {
     profile,
     setProfile,
@@ -54,7 +54,8 @@ export const ProfileSettings: FC<ProfileSettingsProps> = async ({}) => {
     setAvailableHostedModels,
     setAvailableOpenRouterModels,
     availableOpenRouterModels
-  } = useContext(ChatbotUIContext)
+  } = useContext(ChatbotUIContext);
+
 
   const id_of_user = profile?.user_id
 

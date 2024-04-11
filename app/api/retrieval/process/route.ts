@@ -66,6 +66,8 @@ export async function POST(req: Request) {
       }
     }
 
+    console.log("TEST@@@@", fileExtension)
+
     let chunks: FileItemChunk[] = []
 
     switch (fileExtension) {
@@ -89,6 +91,8 @@ export async function POST(req: Request) {
           status: 400
         })
     }
+
+    console.log("chunks", chunks)
 
     let embeddings: any = []
 
