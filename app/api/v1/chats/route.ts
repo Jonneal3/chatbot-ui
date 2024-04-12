@@ -1,24 +1,42 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { createChat } from "@/db/chats"
-
-// Create a single Supabase client for interacting with your database
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+export const maxDuration = 299 // This function can run for a maximum of 5 seconds
+export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    const user_api_key =
+      request.headers.get("Authorization")?.split(" ")[1] || ""
 
+    if (user_api_key) {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: user_api_key
+            }
+          },
+          auth: {
+            persistSession: false,
+            detectSessionInUrl: false,
+            autoRefreshToken: false
+          }
+        }
+      )
+    }
+
+    let body = await request.json()
     // Check if all required parameters are present
     const requiredParams: string[] = [
       "user_id",
       "assistant_id",
       "model",
       "workspace_id"
-    ] // Only user_id and assistant_id are required
+    ]
+
     for (const param of requiredParams) {
       if (!(param in body)) {
         return NextResponse.json(
@@ -38,7 +56,8 @@ export async function POST(request: Request) {
       include_workspace_instructions: false,
       name: "default_name",
       prompt: "default_prompt",
-      temperature: 0.2
+      temperature: 0.2,
+      metadata: body.metadata // Use metadata from the request body
     }
 
     // Merge body and defaultValues

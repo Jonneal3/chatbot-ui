@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { runFunction } from "@/lib/run-message"
 import getOauthObject from "@/lib/get-integration"
-import fetch from "node-fetch" // Import node-fetch for making API requests
+import fetch from "node-fetch"
 import { getProfileByUserId } from "@/db/profile"
 export const maxDuration = 299 // This function can run for a maximum of 5 seconds
 export const dynamic = "force-dynamic"

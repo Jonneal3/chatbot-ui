@@ -89,7 +89,7 @@ export default function Pricing({ user, products, subscription }: Props) {
           <p className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
             No subscription pricing plans found. Create them in your{" "}
             <a
-              className="text-pink-500 underline"
+              className="text-white-500 underline"
               href="https://dashboard.stripe.com/products"
               rel="noopener noreferrer"
               target="_blank"

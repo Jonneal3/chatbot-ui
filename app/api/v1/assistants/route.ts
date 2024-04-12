@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import { createMessage } from "@/db/messages"
+import { createAssistant } from "@/db/assistants"
+
 export const maxDuration = 299 // This function can run for a maximum of 5 seconds
 export const dynamic = "force-dynamic"
 
@@ -32,14 +33,20 @@ export async function POST(request: Request) {
 
     // Check if all required parameters are present
     const requiredParams: string[] = [
-      "chat_id",
-      "assistant_id",
+      "id",
+      "workspace_id",
       "user_id",
-      "content",
-      "image_paths",
+      "sharing",
+      "context_length",
+      "description",
+      "embeddings_provider",
+      "include_profile_context",
+      "include_workspace_instructions",
       "model",
-      "role",
-      "sequence_number"
+      "name",
+      "image_path",
+      "prompt",
+      "temperature"
     ] // Add additional parameters here
     for (const param of requiredParams) {
       if (!(param in body)) {
@@ -52,42 +59,60 @@ export async function POST(request: Request) {
 
     // Assuming these parameters are strings, you can annotate them accordingly
     const {
-      chat_id,
-      assistant_id,
+      id,
+      workspace_id,
       user_id,
-      content,
-      image_paths,
+      sharing,
+      context_length,
+      description,
+      embeddings_provider,
+      include_profile_context,
+      include_workspace_instructions,
       model,
-      role,
-      sequence_number
+      name,
+      image_path,
+      prompt,
+      temperature
     }: {
-      chat_id: string
-      assistant_id: string
+      id: string
+      workspace_id: string
       user_id: string
-      content: string
-      image_paths: string[]
+      sharing: string
+      context_length: number
+      description: string
+      embeddings_provider: string
+      include_profile_context: boolean
+      include_workspace_instructions: boolean
       model: string
-      role: string
-      sequence_number: number
+      name: string
+      image_path: string
+      prompt: string
+      temperature: number
     } = body // Add types for additional parameters
 
-    // Create the message object
-    const message = {
-      chat_id,
-      assistant_id,
+    // Create the assistant object
+    const assistant = {
+      id,
+      workspace_id,
       user_id,
-      content,
-      image_paths,
+      sharing,
+      context_length,
+      description,
+      embeddings_provider,
+      include_profile_context,
+      include_workspace_instructions,
       model,
-      role,
-      sequence_number
+      name,
+      image_path,
+      prompt,
+      temperature
     }
 
     // Using runFunction with inferred types
-    const runWithMessage = await createMessage(message)
+    const runWithAssistant = await createAssistant(assistant, workspace_id) // Passing workspace_id as the second argument
 
     // Returning a response
-    return NextResponse.json({ runs: runWithMessage }) // Return runs data
+    return NextResponse.json({ runs: runWithAssistant }) // Return runs data
   } catch (error: any) {
     // Return the actual error message from Supabase
     return NextResponse.json(
