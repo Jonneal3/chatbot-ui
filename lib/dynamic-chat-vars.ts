@@ -67,13 +67,16 @@ export async function processBodyContent(
             }
           })
         }
+      } else {
+        console.log(`Key ${key} does not exist in metadata.`)
       }
     }
 
     // Return the updated body_content1 if there are matched items
     return body_content1
   } else {
-    // Return an error if no items in dynamicKeys were matched or if chatMetadata is empty
-    throw new Error("No matched items found in metadata or metadata is empty")
+    // No matched items found in metadata or metadata is empty
+    console.log("No matched items found in metadata or metadata is empty")
+    return body_content1
   }
 }

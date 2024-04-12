@@ -36,8 +36,10 @@ export async function POST(request: Request) {
     // Extract customData from the body
     body = body.customData
 
-    const profile = getProfileByUserId(body.user_id)
-    const user_id = (await profile).user_id
+    // const profile = getProfileByUserId(body.user_id)
+    // const user_id = (await profile).user_id
+
+    const user_id = body.user_id
 
     // Check if all required parameters are present
     const requiredParams: string[] = [
@@ -74,6 +76,11 @@ export async function POST(request: Request) {
       message_type: string // Add type for message_type
       contact_id: string // Add type for contact_id
     } = body
+
+    console.log("assist1", assistant_id)
+    console.log("assist2", chat_id)
+    console.log("assist3", user_id)
+    console.log("assist4", content)
 
     // Using runFunction with inferred types
     const runMessage = await runFunction(

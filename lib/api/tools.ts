@@ -96,17 +96,17 @@ export async function tools(
 
     console.log("first_response_messages", firstResponse)
 
-    if (toolCalls.length === 0) {
-      return new Response(message.content, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-    }
-
     // if (toolCalls.length === 0) {
-    //   return firstResponse
+    //   return new Response(message.content, {
+    //     headers: {
+    //       "Content-Type": "application/json"
+    //     }
+    //   })
     // }
+
+    if (toolCalls.length === 0) {
+      return firstResponse
+    }
 
     if (toolCalls.length > 0) {
       for (const toolCall of toolCalls) {
@@ -312,17 +312,15 @@ export async function tools(
             data = await response.json()
             console.log("Successful GET request, data received:", data)
           }
-
-          messages.push({
-            tool_call_id: toolCall.id,
-            role: "tool",
-            name: functionName,
-            content: JSON.stringify(data)
-          })
         }
+        messages.push({
+          tool_call_id: toolCall.id,
+          role: "tool",
+          name: functionName,
+          content: JSON.stringify(data)
+        })
       }
     }
-
     const secondResponse = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages,
@@ -330,7 +328,6 @@ export async function tools(
     })
 
     console.log("response2", secondResponse.choices[0].message.content)
-
     return secondResponse
   } catch (error: any) {
     console.error(error)
