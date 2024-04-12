@@ -96,17 +96,17 @@ export async function tools(
 
     console.log("first_response_messages", firstResponse)
 
-    //   if (toolCalls.length === 0) {
-    //   return new Response(message.content, {
-    //     headers: {
-    //       "Content-Type": "application/json"
-    //     }
-    //   })
-    // }
-
     if (toolCalls.length === 0) {
-      return firstResponse
+      return new Response(message.content, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
     }
+
+    // if (toolCalls.length === 0) {
+    //   return firstResponse
+    // }
 
     if (toolCalls.length > 0) {
       for (const toolCall of toolCalls) {
@@ -128,7 +128,8 @@ export async function tools(
         if (schemaDetail && schemaDetail.post_process !== null) {
           const finalFunc = await runPostProcessingFile(
             parsedArgs,
-            schemaDetail
+            schemaDetail,
+            chat_id
           )
           console.log("Post-processing metadata found:", finalFunc)
           parsedArgs = finalFunc
@@ -321,8 +322,6 @@ export async function tools(
         }
       }
     }
-
-    console.log("messages tool calL!!!!", messages)
 
     const secondResponse = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
