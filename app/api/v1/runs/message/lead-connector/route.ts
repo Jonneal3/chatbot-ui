@@ -3,7 +3,8 @@ import { createClient } from "@supabase/supabase-js"
 import { runFunction } from "@/lib/run-message"
 import getOauthObject from "@/lib/get-integration"
 import fetch from "node-fetch"
-import { getProfileByUserId } from "@/db/profile"
+// import { getProfileByUserId } from "@/db/profile"
+import { processUnitPrice } from "@/lib/unit-price"
 export const maxDuration = 299 // This function can run for a maximum of 5 seconds
 export const dynamic = "force-dynamic"
 
@@ -39,7 +40,10 @@ export async function POST(request: Request) {
     // const profile = getProfileByUserId(body.user_id)
     // const user_id = (await profile).user_id
 
+    console.log("LOGGING")
+
     const user_id = body.user_id
+    const result = await processUnitPrice(user_id)
 
     // Check if all required parameters are present
     const requiredParams: string[] = [

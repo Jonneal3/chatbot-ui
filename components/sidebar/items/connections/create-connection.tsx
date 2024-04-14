@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @next/next/no-img-element */
 import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
 import { Input } from "@/components/ui/input"
@@ -7,7 +8,10 @@ import { getAllActiveIntegrations } from "@/db/integrations"
 import Nango from "@nangohq/frontend"
 import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { v4 as uuidv4 } from "uuid" // Import uuidv4 from 'uuid'
-import { createConnection } from "@/db/connections"
+import {
+  createConnection,
+  getConnectionWorkspacesByWorkspaceId
+} from "@/db/connections"
 
 // Get the public key from environment variables
 const publicKey = process.env.NEXT_PUBLIC_NANGO_PUBLIC_KEY_PROD || ""
@@ -43,6 +47,8 @@ export const CreateConnection: FC<CreateConnectionProps> = ({
   const { profile, selectedWorkspace } = useContext(ChatbotUIContext)
   const [authIntegrations, setAuthIntegrations] = useState<Integration[]>([])
   const [searchQuery, setSearchQuery] = useState<string>("")
+
+  const { setConnections } = useContext(ChatbotUIContext)
 
   useEffect(() => {
     const fetchAuthIntegrations = async () => {
@@ -109,6 +115,11 @@ export const CreateConnection: FC<CreateConnectionProps> = ({
         selectedWorkspace.id, // Provide the actual workspace ID here
         profile.user_id // Provide the actual user ID here
       )
+
+      const connectionData = await getConnectionWorkspacesByWorkspaceId(
+        selectedWorkspace.id
+      )
+      setConnections(connectionData.connections)
     } catch (error) {
       // Handle errors
       console.error("Error:", error)
