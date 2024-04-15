@@ -16,7 +16,7 @@ import { TabsList } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "@/components/utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
-import Account from "@/components/utility/billing"
+import { Billing } from "@/components/utility/billing"
 import logo from "@/public/icon-192x192.png"
 import { ChatbotUISVG } from "../icons/chatbotui-svg"
 
@@ -100,7 +100,7 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         {/* TODO */}
         {/* <Alerts /> */}
 
-        <WithTooltip display={<div>Billing</div>} trigger={<Account />} />
+        <WithTooltip display={<div>Billing</div>} trigger={<Billing />} />
 
         <WithTooltip
           display={<div>Profile Settings</div>}

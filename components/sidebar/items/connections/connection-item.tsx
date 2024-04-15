@@ -5,6 +5,7 @@ import { Tables, TablesUpdate } from "@/supabase/types"
 import { IconArrowsExchange } from "@tabler/icons-react"
 import { FC, useState } from "react"
 import { SidebarItem } from "../all/sidebar-display-item"
+import Image from "next/image"
 
 interface ConnectionItemProps {
   connection: Tables<"connections">
@@ -13,13 +14,22 @@ interface ConnectionItemProps {
 export const ConnectionItem: FC<ConnectionItemProps> = ({ connection }) => {
   const [isTyping, setIsTyping] = useState(false)
   const [name, setName] = useState(connection.name)
-
   return (
     <SidebarItem
       item={connection}
       isTyping={isTyping}
       contentType="connections"
-      icon={<IconArrowsExchange height={30} width={30} />}
+      icon={
+        connection.image ? (
+          <img
+            src={connection.image}
+            alt="Connection Icon"
+            className="mr-3 size-6"
+          />
+        ) : (
+          <IconArrowsExchange height={30} width={30} />
+        )
+      }
       updateState={
         {
           name

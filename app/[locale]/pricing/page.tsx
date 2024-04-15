@@ -28,7 +28,6 @@ export default async function PricingPage() {
 
   return (
     <>
-      {console.log("TESTING !@#$%%%%%")}
       <Pricing
         user={user}
         products={products ?? []}

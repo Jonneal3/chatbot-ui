@@ -50,10 +50,11 @@ export const CreateConnection: FC<CreateConnectionProps> = ({
           id: result.connectionId,
           integration_id: result.providerConfigKey,
           sharing: "private",
-          user_id: profile.user_id,
-          metadata: {},
-          name: `${profile.display_name}'s ${result.providerConfigKey} Connection`,
-          folder_id: null
+          user_id: profile.user_id, // Provide the actual user ID here
+          metadata: {}, // Provide any metadata if needed, otherwise use an empty object
+          name: `${profile.display_name}'s ${result.providerConfigKey} Connection`, // Provide a name for the connection
+          folder_id: null, // Provide the folder ID if available, otherwise omit or provide NULL
+          image: integration.image
         },
         selectedWorkspace.id,
         profile.user_id
