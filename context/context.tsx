@@ -40,6 +40,8 @@ interface ChatbotUIContext {
   setWorkspaces: Dispatch<SetStateAction<Tables<"workspaces">[]>>
   connections: Tables<"connections">[]
   setConnections: Dispatch<SetStateAction<Tables<"connections">[]>>
+  integrations: Tables<"integrations">[]
+  setIntegrations: Dispatch<SetStateAction<Tables<"integrations">[]>>
 
   // MODELS STORE
   envKeyMap: Record<string, VALID_ENV_KEYS>
@@ -64,6 +66,12 @@ interface ChatbotUIContext {
   // CONNECTION STORE
   selectedConnection: Tables<"connections"> | null
   setSelectedConnection: Dispatch<SetStateAction<Tables<"connections"> | null>>
+
+  // INTEGRATION STORE
+  selectedIntegration: Tables<"integrations"> | null
+  setSelectedIntegration: Dispatch<
+    SetStateAction<Tables<"integrations"> | null>
+  >
 
   // ASSISTANT STORE
   selectedAssistant: Tables<"assistants"> | null
@@ -172,6 +180,8 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   setWorkspaces: () => {},
   connections: [],
   setConnections: () => {},
+  integrations: [],
+  setIntegrations: () => {},
 
   // MODELS STORE
   envKeyMap: {},
@@ -196,6 +206,10 @@ export const ChatbotUIContext = createContext<ChatbotUIContext>({
   // CONNECTION STORE
   selectedConnection: null,
   setSelectedConnection: () => {},
+
+  // INTEGRATION STORE
+  selectedIntegration: null,
+  setSelectedIntegration: () => {},
 
   // ASSISTANT STORE
   selectedAssistant: null,
