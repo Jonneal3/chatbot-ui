@@ -109,13 +109,6 @@ export const Sidebar: FC<SidebarProps> = ({ contentType, showSidebar }) => {
             case "models":
               return renderSidebarContent("models", models, modelFolders)
 
-            case "integrations":
-              return renderSidebarContent(
-                "integrations",
-                integrations,
-                integrationFolders
-              )
-
             case "connections":
               return renderSidebarContent(
                 "connections",

@@ -34,8 +34,8 @@ export const CreateConnection: FC<CreateConnectionProps> = ({
   isOpen,
   onOpenChange
 }) => {
-  const { profile, selectedWorkspace, integrations } =
-    useContext(ChatbotUIContext)
+  const { profile, selectedWorkspace, integrations, setConnections } =
+    useContext(ChatbotUIContext) // Include setConnections from context
   const [searchQuery, setSearchQuery] = useState<string>("")
 
   const handleConnect = async (integration: Integration) => {
@@ -50,19 +50,21 @@ export const CreateConnection: FC<CreateConnectionProps> = ({
           id: result.connectionId,
           integration_id: result.providerConfigKey,
           sharing: "private",
-          user_id: profile.user_id, // Provide the actual user ID here
-          metadata: {}, // Provide any metadata if needed, otherwise use an empty object
-          name: `${profile.display_name}'s ${result.providerConfigKey} Connection`, // Provide a name for the connection
-          folder_id: null, // Provide the folder ID if available, otherwise omit or provide NULL
+          user_id: profile.user_id,
+          metadata: {},
+          name: `${profile.display_name}'s ${result.providerConfigKey} Connection`,
+          folder_id: null,
           image: integration.image
         },
         selectedWorkspace.id,
         profile.user_id
       )
 
-      const connectionData = await getConnectionWorkspacesByWorkspaceId(
+      // Fetch updated connections after adding a new one
+      const updatedConnections = await getConnectionWorkspacesByWorkspaceId(
         selectedWorkspace.id
       )
+      setConnections(updatedConnections.connections) // Update context variable with the updated list of connections
     } catch (error) {
       console.error("Error:", error)
     }

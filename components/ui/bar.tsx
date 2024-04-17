@@ -18,7 +18,7 @@ const CreditBar: React.FC<CreditBarProps> = ({ credits, reloadAmount }) => {
       <div className="flex items-center">
         <div className="h-10 w-full overflow-hidden rounded-md border border-gray-400 bg-transparent">
           <div
-            className="h-full bg-gray-500"
+            className="h-full bg-white"
             style={{ width: `${percentage}%` }}
             title={`Credits: ${dollars}`}
           ></div>

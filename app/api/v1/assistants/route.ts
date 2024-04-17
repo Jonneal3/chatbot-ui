@@ -33,7 +33,6 @@ export async function POST(request: Request) {
 
     // Check if all required parameters are present
     const requiredParams: string[] = [
-      "id",
       "workspace_id",
       "user_id",
       "sharing",
@@ -92,8 +91,6 @@ export async function POST(request: Request) {
 
     // Create the assistant object
     const assistant = {
-      id,
-      workspace_id,
       user_id,
       sharing,
       context_length,
@@ -111,8 +108,8 @@ export async function POST(request: Request) {
     // Using runFunction with inferred types
     const runWithAssistant = await createAssistant(assistant, workspace_id) // Passing workspace_id as the second argument
 
-    // Returning a response
-    return NextResponse.json({ runs: runWithAssistant }) // Return runs data
+    // Returning a response with "assistant" as the key
+    return NextResponse.json({ assistant: runWithAssistant }) // Return the response with "assistant" key
   } catch (error: any) {
     // Return the actual error message from Supabase
     return NextResponse.json(

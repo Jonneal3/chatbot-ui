@@ -32,10 +32,11 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   useEffect(() => {
     const fetchSubscription = async () => {
       try {
-        const subscriptionData = await getActiveOrTrialingSubscriptionsByUserId(
-          profile?.user_id || ""
-        )
-        setSubscription(subscriptionData)
+        if (profile) {
+          const subscriptionData =
+            await getActiveOrTrialingSubscriptionsByUserId(profile.user_id)
+          setSubscription(subscriptionData)
+        }
       } catch (error) {
         console.error("Error fetching subscription:", error)
         setSubscription(null)
@@ -63,13 +64,15 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
   const handleUpdateReloadAmount = async () => {
     if (newReloadAmount >= 15) {
       try {
-        const updatedProfile = await updateProfile(profile.id, {
-          reload_amount: newReloadAmount
-        })
-        if (updatedProfile) {
-          setReloadAmount(updatedProfile.reload_amount)
+        if (profile) {
+          const updatedProfile = await updateProfile(profile.id, {
+            reload_amount: newReloadAmount
+          })
+          if (updatedProfile) {
+            setReloadAmount(updatedProfile.reload_amount)
+          }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error updating reload amount:", error.message)
         // Handle error, e.g., display an error message
       }
@@ -82,9 +85,11 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({}) => {
 
   return (
     <>
-      <CustomerPortalForm subscription={subscription} />
+      {profile && <CustomerPortalForm subscription={subscription} />}
       {/* Credit bar */}
-      <CreditBar credits={profile?.credits || 0} reloadAmount={reloadAmount} />
+      {profile && (
+        <CreditBar credits={profile.credits || 0} reloadAmount={reloadAmount} />
+      )}
       {/* Credit reload input */}
       <div className="mt-4">
         <div className="mb-2 font-semibold">Credit Reload Amount</div>
@@ -115,11 +120,11 @@ export const Billing: FC<BillingProps> = () => {
   }
 
   return (
-    <Sheet open={isOpen} onOpenChange={setIsOpen} className="left-0">
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger>
         <IconReceipt2 size={SIDEBAR_ICON_SIZE} />
       </SheetTrigger>
-      <SheetContent className="flex flex-col justify-between" side="left">
+      <SheetContent side="left">
         <div className="grow overflow-auto">
           <SheetHeader>
             <SheetTitle className="flex items-center justify-between space-x-2">

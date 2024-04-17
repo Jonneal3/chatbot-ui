@@ -1065,7 +1065,7 @@ export type Database = {
         Row: {
           api_key: string
           base_url: string
-          context_length: number | null
+          context_length: number 
           created_at: string
           description: string
           folder_id: string | null

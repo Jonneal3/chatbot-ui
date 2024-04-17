@@ -10,7 +10,6 @@ export type DataListType =
   | Tables<"tools">[]
   | Tables<"models">[]
   | Tables<"connections">[]
-  | Tables<"integrations">[]
 
 export type DataItemType =
   | Tables<"collections">
@@ -22,4 +21,3 @@ export type DataItemType =
   | Tables<"tools">
   | Tables<"models">
   | Tables<"connections">
-  | Tables<"integrations">[]
