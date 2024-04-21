@@ -7,7 +7,6 @@ import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions"
-import { createMessage } from "@/db/messages"
 import { UUID } from "crypto"
 import getOauthObject from "@/lib/get-integration"
 import runPostProcessingFile from "@/lib/post-process"
@@ -83,6 +82,8 @@ export async function tools(
         request_in_body: convertedSchema.routes[0].requestInBody
       })
     }
+
+    console.log("MESSAGES", messages)
 
     const firstResponse = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
@@ -321,6 +322,9 @@ export async function tools(
         })
       }
     }
+
+    console.log("MESSAGES", messages)
+
     const secondResponse = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages,

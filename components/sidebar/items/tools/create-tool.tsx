@@ -1,13 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable react-hooks/rules-of-hooks */
-import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
-import { ChatbotUIContext } from "@/context/context"
 import { TOOL_DESCRIPTION_MAX, TOOL_NAME_MAX } from "@/db/limits"
 import { TablesInsert } from "@/supabase/types"
-import { FC, useContext, useState, useEffect } from "react"
+import { FC, useState, useEffect, useContext } from "react"
+import { SidebarCreateItem } from "@/components/sidebar/items/all/sidebar-create-item"
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -15,16 +14,12 @@ import {
   DropdownMenuItem
 } from "@/components/ui/dropdown-menu"
 import { getConnectionWorkspacesByWorkspaceId } from "@/db/connections"
+import { ChatbotUIContext } from "@/context/context"
 
-interface AuthIntegration {
+interface Connection {
   image: string
   id: string
-}
-
-interface ConnectionWithIntegration {
-  connection_id: string
   name: string
-  auth_integration: AuthIntegration
 }
 
 interface CreateToolProps {
@@ -43,9 +38,8 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
   const [schema, setSchema] = useState("")
   const [isRequestInBody, setIsRequestInBody] = useState(true)
   const [connectedAccount, setConnectedAccount] = useState("")
-  const [dropdownOptions, setDropdownOptions] = useState<
-    ConnectionWithIntegration[]
-  >([])
+  const [connectedAccountName, setConnectedAccountName] = useState("")
+  const [dropdownOptions, setDropdownOptions] = useState<Connection[]>([])
 
   if (!profile || !selectedWorkspace) return null
 
@@ -55,26 +49,11 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
         const connections = await getConnectionWorkspacesByWorkspaceId(
           selectedWorkspace?.id as string
         )
-        const dropdownOptions = await Promise.all(
-          (
-            connections.connections as unknown as {
-              name: string
-              created_at: string
-              id: string
-              auth_integration_id: string
-              user_id: string
-              metadata: any
-            }[]
-          ).map(async connection => {
-            // Fetch auth_integration data for each connection
-            const integrationResponse = await fetchIntegrationData(
-              connection.auth_integration_id
-            )
-            return {
-              connection_id: connection.id,
-              name: connection.name,
-              auth_integration: integrationResponse
-            }
+        const dropdownOptions = connections.connections.map(
+          (connection: any) => ({
+            id: connection.id,
+            name: connection.name,
+            image: connection.image || "" // set default image if image is null
           })
         )
         setDropdownOptions(dropdownOptions)
@@ -91,22 +70,9 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
     }
   }, [selectedWorkspace])
 
-  const fetchIntegrationData = async (
-    integrationKey: string
-  ): Promise<AuthIntegration> => {
-    try {
-      // Fetch auth_integration data using integrationKey
-      const response = await fetch(`/api/auth_integrations/${integrationKey}`)
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.error("Error fetching auth_integration data:", error)
-      return { image: "", id: "" } // Return default value if error occurs
-    }
-  }
-
-  const handleDropdownChange = (value: string) => {
-    setConnectedAccount(value)
+  const handleDropdownChange = (id: string, name: string) => {
+    setConnectedAccount(id) // Set the ID of the selected account
+    setConnectedAccountName(name) // Set the name for display
   }
 
   return (
@@ -121,7 +87,7 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
           custom_headers: customHeaders,
           schema,
           request_in_body: isRequestInBody,
-          connection_id: connectedAccount // Include connectedAccount in createState
+          connection_id: connectedAccount
         } as TablesInsert<"tools">
       }
       isOpen={isOpen}
@@ -150,14 +116,13 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
 
           <div className="space-y-1">
             <Label>Connected Accounts</Label>
-            <div></div>
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Input
                   type="text"
                   placeholder={`Select Connected Account (${dropdownOptions.length} connections)`}
-                  value={connectedAccount}
-                  onChange={e => setConnectedAccount(e.target.value)}
+                  value={connectedAccountName}
+                  onChange={e => setConnectedAccountName(e.target.value)}
                   readOnly={dropdownOptions.length === 0}
                   style={{
                     width: "20.9vw",
@@ -166,7 +131,9 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
                   }}
                 />
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent
+                style={{ width: "21vw", maxHeight: "20rem", overflowY: "auto" }}
+              >
                 {dropdownOptions.length === 0 ? (
                   <DropdownMenuItem disabled>
                     No connections available
@@ -174,25 +141,24 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
                 ) : (
                   dropdownOptions.map(option => (
                     <DropdownMenuItem
-                      key={option.connection_id}
-                      onClick={() => handleDropdownChange(option.connection_id)}
-                      style={{
-                        width: "20vw",
-                        display: "flex",
-                        alignItems: "center"
-                      }}
+                      key={option.id}
+                      onClick={() =>
+                        handleDropdownChange(option.id, option.name)
+                      }
+                      style={{ display: "flex", alignItems: "center" }}
                     >
-                      <img
-                        src={option.auth_integration.image}
-                        alt="Logo"
-                        style={{
-                          marginRight: "0.5rem",
-                          width: "2rem",
-                          height: "2rem"
-                        }}
-                      />
-                      <span>{option.name}</span>{" "}
-                      {/* Display connected account name */}
+                      {option.image && (
+                        <img
+                          src={option.image}
+                          alt={option.name}
+                          style={{
+                            marginRight: "0.5rem",
+                            width: "2rem",
+                            height: "2rem"
+                          }}
+                        />
+                      )}
+                      <span>{option.name}</span>
                     </DropdownMenuItem>
                   ))
                 )}
@@ -260,3 +226,5 @@ export const CreateTool: FC<CreateToolProps> = ({ isOpen, onOpenChange }) => {
     />
   )
 }
+
+export default CreateTool

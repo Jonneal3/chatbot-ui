@@ -20,6 +20,7 @@ export const getMessagesByChatId = async (chatId: string) => {
     .from("messages")
     .select("*")
     .eq("chat_id", chatId)
+    .order("created_at", { ascending: true }) // Order messages by created_at timestamp in ascending order
 
   if (!messages) {
     throw new Error("Messages not found")
