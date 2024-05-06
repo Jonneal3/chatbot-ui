@@ -44,3 +44,6 @@ export const MODEL_DESCRIPTION_MAX = 500
 
 //CONNECTIONS
 export const CONNECTION_NAME_MAX = 100
+
+//TEAMS
+export const TEAM_NAME_MAX = 100

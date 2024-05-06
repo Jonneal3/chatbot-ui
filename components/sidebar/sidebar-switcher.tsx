@@ -9,10 +9,11 @@ import {
   IconPencil,
   IconRobotFace,
   IconSparkles,
+  IconUser,
   IconSwitchHorizontal
 } from "@tabler/icons-react"
 import { FC } from "react"
-import { TabsList } from "../ui/tabs"
+import { Tabs, TabsList } from "../ui/tabs"
 import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "@/components/utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
@@ -93,17 +94,17 @@ export const SidebarSwitcher: FC<SidebarSwitcherProps> = ({
         />
       </TabsList>
 
-      <div className="grid h-[75px] grid-rows-2">
-        {/* TODO */}
-        {/* <WithTooltip display={<div>Import</div>} trigger={<Import />} /> */}
-
-        {/* TODO */}
-        {/* <Alerts /> */}
-
+      <div className="flex h-[100px] flex-col items-center justify-center space-y-2">
+        <TabsList className="items-3">
+          <SidebarSwitchItem
+            icon={<IconUser size={SIDEBAR_ICON_SIZE} />}
+            contentType="teams"
+            onContentTypeChange={onContentTypeChange}
+          />
+        </TabsList>
         <WithTooltip display={<div>Billing</div>} trigger={<Billing />} />
-
         <WithTooltip
-          display={<div>Profile Settings</div>}
+          display={<div className="text-center">Profile Settings</div>}
           trigger={<ProfileSettings />}
         />
       </div>

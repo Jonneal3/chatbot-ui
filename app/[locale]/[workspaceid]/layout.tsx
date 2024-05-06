@@ -14,6 +14,7 @@ import { getPromptWorkspacesByWorkspaceId } from "@/db/prompts"
 import { getAssistantImageFromStorage } from "@/db/storage/assistant-images"
 import { getToolWorkspacesByWorkspaceId } from "@/db/tools"
 import { getConnectionWorkspacesByWorkspaceId } from "@/db/connections"
+import { getTeamUsersByWorkspaceId } from "@/db/teams"
 import { getAllActiveIntegrations } from "@/db/integrations"
 import { getWorkspaceById } from "@/db/workspaces"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
@@ -47,6 +48,7 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
     setModels,
     setConnections,
     setIntegrations,
+    setTeams,
     selectedWorkspace,
     setSelectedWorkspace,
     setSelectedChat,
@@ -162,6 +164,9 @@ export default function WorkspaceLayout({ children }: WorkspaceLayoutProps) {
 
     const integrationData = await getAllActiveIntegrations()
     setIntegrations(integrationData)
+
+    const teamData = await getTeamUsersByWorkspaceId(workspaceId)
+    setTeams(teamData)
 
     const connectionData =
       await getConnectionWorkspacesByWorkspaceId(workspaceId)

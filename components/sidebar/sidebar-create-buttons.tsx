@@ -12,6 +12,7 @@ import { CreateModel } from "./items/models/create-model"
 import { CreatePreset } from "./items/presets/create-preset"
 import { CreatePrompt } from "./items/prompts/create-prompt"
 import { CreateTool } from "./items/tools/create-tool"
+import { CreateTeam } from "./items/teams/create-teams"
 import { CreateConnection } from "./items/connections/create-connection"
 
 interface SidebarCreateButtonsProps {
@@ -35,6 +36,7 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
   const [isCreatingTool, setIsCreatingTool] = useState(false)
   const [isCreatingModel, setIsCreatingModel] = useState(false)
   const [isCreatingConnection, setIsCreatingConnection] = useState(false)
+  const [isCreatingTeam, setIsCreatingTeam] = useState(false)
 
   const handleCreateFolder = async () => {
     if (!profile) return
@@ -95,6 +97,11 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
       case "connections":
         return async () => {
           setIsCreatingConnection(true)
+        }
+
+      case "teams":
+        return async () => {
+          setIsCreatingTeam(true)
         }
 
       default:
@@ -165,6 +172,10 @@ export const SidebarCreateButtons: FC<SidebarCreateButtonsProps> = ({
           isOpen={isCreatingConnection}
           onOpenChange={setIsCreatingConnection}
         />
+      )}
+
+      {isCreatingTeam && (
+        <CreateTeam isOpen={isCreatingTeam} onOpenChange={setIsCreatingTeam} />
       )}
     </div>
   )

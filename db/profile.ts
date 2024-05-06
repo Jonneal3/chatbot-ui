@@ -28,6 +28,20 @@ export const getProfilesByUserId = async (userId: string) => {
   return profiles
 }
 
+export const getProfilesByEmail = async (email: string) => {
+  // Change parameter to 'email'
+  const { data: profiles, error } = await supabase // Use 'email' in the query
+    .from("profiles")
+    .select("*")
+    .eq("email", email)
+
+  if (!profiles) {
+    throw new Error(error.message)
+  }
+
+  return profiles
+}
+
 export const createProfile = async (profile: TablesInsert<"profiles">) => {
   const { data: createdProfile, error } = await supabase
     .from("profiles")

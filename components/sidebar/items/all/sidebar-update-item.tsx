@@ -84,6 +84,7 @@ import {
   getToolWorkspacesByToolId,
   updateTool
 } from "@/db/tools"
+import { updateTeam } from "@/db/teams"
 import { convertBlobToBase64 } from "@/lib/blob-to-b64"
 import { Tables, TablesUpdate } from "@/supabase/types"
 import { CollectionFile, ContentType, DataItemType } from "@/types"
@@ -121,7 +122,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     setTools,
     setModels,
     setAssistantImages,
-    setConnections
+    setConnections,
+    setTeams
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -205,7 +207,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     tools: null,
     models: null,
-    connections: null
+    connections: null,
+    teams: null
   }
 
   const fetchDataFunctions = {
@@ -236,7 +239,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     },
     tools: null,
     models: null,
-    connections: null
+    connections: null,
+    teams: null
   }
 
   const fetchWorkpaceFunctions = {
@@ -276,7 +280,19 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
   }
 
   const fetchSelectedWorkspaces = async () => {
-    const fetchFunction = fetchWorkpaceFunctions[contentType]
+    // Define fetchWorkpaceFunctions with all content types and their corresponding functions
+    const fetchFunction: {
+      chats: null
+      presets: (presetId: string) => Promise<any> // Update the return type if necessary
+      collections: (collectionId: string) => Promise<any> // Update the return type if necessary
+      files: (fileId: string) => Promise<any> // Update the return type if necessary
+      models: (modelId: string) => Promise<any> // Update the return type if necessary
+      prompts: (promptId: string) => Promise<any> // Update the return type if necessary
+      tools: (toolId: string) => Promise<any> // Update the return type if necessary
+      assistants: (assistantId: string) => Promise<any> // Update the return type if necessary
+      connections: (connectionId: string) => Promise<any> // Update the return type if necessary
+    }[keyof typeof fetchWorkpaceFunctions] =
+      fetchWorkpaceFunctions[contentType as keyof typeof fetchWorkpaceFunctions]
 
     if (!fetchFunction) return []
 
@@ -603,6 +619,20 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
       )
 
       return updatedModel
+    },
+    teams: async (teamId: string, updateState: TablesUpdate<"teams">) => {
+      const updatedTeam = await updateTeam(teamId, updateState)
+
+      await handleWorkspaceUpdates(
+        startingWorkspaces,
+        selectedWorkspaces,
+        teamId,
+        deleteModelWorkspace,
+        createModelWorkspaces as any,
+        "team_id"
+      )
+
+      return updatedTeam
     }
   }
 
@@ -615,7 +645,8 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     assistants: setAssistants,
     tools: setTools,
     models: setModels,
-    connections: setConnections
+    connections: setConnections,
+    teams: setTeams
   }
 
   const handleUpdate = async () => {
@@ -665,6 +696,7 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
     }
   }
 
+  // Inside the JSX return of SidebarUpdateItem component
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -681,20 +713,20 @@ export const SidebarUpdateItem: FC<SidebarUpdateItemProps> = ({
             </SheetTitle>
           </SheetHeader>
 
+          {/* Updated block starts here */}
           <div className="mt-4 space-y-3">
-            {workspaces.length > 1 && (
+            {contentType !== "teams" && workspaces.length > 1 && (
               <div className="space-y-1">
                 <Label>Assigned Workspaces</Label>
-
                 <AssignWorkspaces
                   selectedWorkspaces={selectedWorkspaces}
                   onSelectWorkspace={handleSelectWorkspace}
                 />
               </div>
             )}
-
             {renderInputs(renderState[contentType])}
           </div>
+          {/* Updated block ends here */}
         </div>
 
         <SheetFooter className="mt-2 flex justify-between">
