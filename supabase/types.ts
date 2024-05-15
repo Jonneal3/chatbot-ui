@@ -1019,7 +1019,7 @@ export type Database = {
         Row: {
           created_at: string
           model_id: string
-          updated_at: string | null
+          updated_at: string 
           user_id: string
           workspace_id: string
         }
@@ -1065,7 +1065,7 @@ export type Database = {
         Row: {
           api_key: string
           base_url: string
-          context_length: number | null
+          context_length: number 
           created_at: string
           description: string
           folder_id: string | null

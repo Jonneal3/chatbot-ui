@@ -169,7 +169,7 @@ export default function SetupPage() {
           <StepContainer
             stepDescription="Let's create your profile."
             stepNum={currentStep}
-            stepTitle="Welcome to Chatbot UI"
+            stepTitle="Welcome to Samurai"
             onShouldProceed={handleShouldProceed}
             showNextButton={!!(username && usernameAvailable)}
             showBackButton={false}
@@ -238,13 +238,14 @@ export default function SetupPage() {
             stepDescription="You are all set up!"
             stepNum={currentStep}
             stepTitle="Setup Complete"
-            onShouldProceed={handleShouldProceed}
+            onShouldProceed={() => router.push("/pricing")}
             showNextButton={true}
             showBackButton={true}
           >
             <FinishStep displayName={displayName} />
           </StepContainer>
         )
+
       default:
         return null
     }
