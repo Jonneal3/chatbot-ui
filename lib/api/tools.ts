@@ -79,7 +79,7 @@ export async function tools(
         post_process: selectedTool.post_process,
         connection_id: selectedTool.connection_id,
         routeMap,
-        request_in_body: selectedTool.request_in_body
+        request_in_body: convertedSchema.routes[0].requestInBody
       })
     }
 
@@ -89,14 +89,17 @@ export async function tools(
       tools: allTools
     })
 
-    console.log("first response", firstResponse)
-
     const message = firstResponse.choices[0].message
-
-    console.log("first response message", message)
     messages.push(message)
-
     const toolCalls = message.tool_calls || []
+
+    if (toolCalls.length === 0) {
+      return new Response(message.content, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
+    }
 
     if (toolCalls.length > 0) {
       for (const toolCall of toolCalls) {

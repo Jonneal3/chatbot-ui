@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TextareaAutosize } from "@/components/ui/textarea-autosize"
@@ -16,15 +15,10 @@ import {
 import { getConnectionWorkspacesByWorkspaceId } from "@/db/connections"
 import { ChatbotUIContext } from "@/context/context"
 
-interface AuthIntegration {
-  image: string
-  id: string
-}
-
-interface ConnectionWithIntegration {
+interface Connection {
+  image: string | null
   connection_id: string
   name: string
-  integration: AuthIntegration
 }
 
 interface ToolItemProps {
@@ -45,9 +39,10 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
   const [connectedAccount, setConnectedAccount] = useState(
     tool.connection_id || ""
   )
-  const [dropdownOptions, setDropdownOptions] = useState<
-    ConnectionWithIntegration[]
-  >([])
+  const [dropdownOptions, setDropdownOptions] = useState<Connection[]>([])
+  const [currentConnection, setCurrentConnection] = useState<Connection | null>(
+    null
+  )
 
   useEffect(() => {
     const fetchConnections = async () => {
@@ -55,20 +50,19 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
         const connections = await getConnectionWorkspacesByWorkspaceId(
           selectedWorkspace?.id as string
         )
-        const dropdownOptions = await Promise.all(
-          connections.connections.map(async connection => {
-            // Fetch auth_integration data for each connection
-            const integrationResponse = await fetchIntegrationData(
-              connection.integration_id
-            )
-            return {
-              connection_id: connection.id,
-              name: connection.name,
-              integration: integrationResponse
-            }
+        const dropdownOptions = connections.connections.map(
+          (connection: any) => ({
+            connection_id: connection.id,
+            name: connection.name,
+            image: connection.image || "" // set default image if image is null
           })
         )
         setDropdownOptions(dropdownOptions)
+        // Check if the current connection is in the dropdown options
+        const current = dropdownOptions.find(
+          option => option.connection_id === connectedAccount
+        )
+        setCurrentConnection(current || null)
       } catch (error) {
         console.error("Error fetching connections:", error)
       }
@@ -82,22 +76,13 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
     }
   }, [selectedWorkspace])
 
-  const fetchIntegrationData = async (
-    integrationKey: string
-  ): Promise<AuthIntegration> => {
-    try {
-      // Fetch auth_integration data using integrationKey
-      const response = await fetch(`/integrations/${integrationKey}`)
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.error("Error fetching auth_integration data:", error)
-      return { image: "", id: "" } // Return default value if error occurs
-    }
-  }
-
   const handleDropdownChange = (value: string) => {
     setConnectedAccount(value)
+    // Update the current connection
+    const current = dropdownOptions.find(
+      option => option.connection_id === value
+    )
+    setCurrentConnection(current || null)
   }
 
   return (
@@ -119,7 +104,6 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
         <>
           <div className="space-y-1">
             <Label>Name</Label>
-
             <Input
               placeholder="Tool name..."
               value={name}
@@ -130,7 +114,6 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
 
           <div className="space-y-1">
             <Label>Description</Label>
-
             <Input
               placeholder="Tool description..."
               value={description}
@@ -141,14 +124,13 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
 
           <div className="space-y-1">
             <Label>Connected Accounts</Label>
-            <div></div>
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Input
                   type="text"
                   placeholder={`Select Connected Account (${dropdownOptions.length} connections)`}
-                  value={connectedAccount}
-                  onChange={e => setConnectedAccount(e.target.value)}
+                  value={currentConnection ? currentConnection.name : ""}
+                  onChange={e => setName(e.target.value)}
                   readOnly={dropdownOptions.length === 0}
                   style={{
                     width: "20.9vw",
@@ -157,7 +139,9 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
                   }}
                 />
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent
+                style={{ width: "21vw", maxHeight: "20rem", overflowY: "auto" }}
+              >
                 {dropdownOptions.length === 0 ? (
                   <DropdownMenuItem disabled>
                     No connections available
@@ -167,23 +151,20 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
                     <DropdownMenuItem
                       key={option.connection_id}
                       onClick={() => handleDropdownChange(option.connection_id)}
-                      style={{
-                        width: "20vw",
-                        display: "flex",
-                        alignItems: "center"
-                      }}
+                      style={{ display: "flex", alignItems: "center" }}
                     >
-                      <img
-                        src={option.integration.image}
-                        alt="Logo"
-                        style={{
-                          marginRight: "0.5rem",
-                          width: "2rem",
-                          height: "2rem"
-                        }}
-                      />
-                      <span>{option.name}</span>{" "}
-                      {/* Display connected account name */}
+                      {option.image && (
+                        <img
+                          src={option.image}
+                          alt={option.name}
+                          style={{
+                            marginRight: "0.5rem",
+                            width: "2rem",
+                            height: "2rem"
+                          }}
+                        />
+                      )}
+                      <span>{option.name}</span>
                     </DropdownMenuItem>
                   ))
                 )}
@@ -193,7 +174,6 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
 
           <div className="space-y-1">
             <Label>Custom Headers</Label>
-
             <TextareaAutosize
               placeholder={`{"X-api-key": "1234567890"}`}
               value={customHeaders}
@@ -204,7 +184,6 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
 
           <div className="space-y-1">
             <Label>Schema</Label>
-
             <TextareaAutosize
               placeholder={`{
                 "openapi": "3.1.0",
@@ -252,3 +231,5 @@ export const ToolItem: FC<ToolItemProps> = ({ tool }) => {
     />
   )
 }
+
+export default ToolItem

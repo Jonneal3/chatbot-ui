@@ -121,7 +121,7 @@ export default function Pricing({ user, products, subscription }: Props) {
                     billingInterval === "month"
                       ? "relative w-1/2 border-zinc-800 bg-zinc-700 text-white shadow-sm"
                       : "relative ml-0.5 w-1/2 border border-transparent text-zinc-400"
-                  } m-1 whitespace-nowrap rounded-md py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 sm:w-auto sm:px-8`}
+                  } m-1 whitespace-nowrap rounded-md py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 sm:w-auto sm:px-8`}
                 >
                   Monthly billing
                 </button>
@@ -134,7 +134,7 @@ export default function Pricing({ user, products, subscription }: Props) {
                     billingInterval === "year"
                       ? "relative w-1/2 border-zinc-800 bg-zinc-700 text-white shadow-sm"
                       : "relative ml-0.5 w-1/2 border border-transparent text-zinc-400"
-                  } m-1 whitespace-nowrap rounded-md py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 sm:w-auto sm:px-8`}
+                  } m-1 whitespace-nowrap rounded-md py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 sm:w-auto sm:px-8`}
                 >
                   Yearly billing
                 </button>
@@ -156,9 +156,9 @@ export default function Pricing({ user, products, subscription }: Props) {
                 <div
                   key={product.id}
                   className={cn(
-                    "flex flex-col divide-y divide-zinc-600 rounded-lg bg-zinc-900 shadow-sm",
+                    "flex flex-col divide-y  divide-zinc-100 rounded-lg bg-zinc-900 text-white shadow-sm",
                     {
-                      "border border-pink-500": subscription
+                      "border border-white": subscription
                         ? product.name === subscription?.prices?.products?.name
                         : product.name === "Freelancer"
                     },
@@ -171,7 +171,7 @@ export default function Pricing({ user, products, subscription }: Props) {
                     <h2 className="text-2xl font-semibold leading-6 text-white">
                       {product.name}
                     </h2>
-                    <p className="mt-4 text-zinc-300">{product.description}</p>
+                    <p className="mt-4 text-zinc-100">{product.description}</p>
                     <p className="mt-8">
                       <span className="white text-5xl font-extrabold">
                         {priceString}
@@ -185,7 +185,7 @@ export default function Pricing({ user, products, subscription }: Props) {
                       type="button"
                       loading={priceIdLoading === price.id}
                       onClick={() => handleStripeCheckout(price)}
-                      className="mt-8 block w-full rounded-md py-2 text-center text-sm font-semibold text-white hover:bg-zinc-900"
+                      className="mt-8 block w-full rounded-md bg-white py-2 text-center text-sm font-semibold text-zinc-900 hover:bg-zinc-400"
                     >
                       {subscription ? "Subscribe" : "Subscribe"}
                     </Button>

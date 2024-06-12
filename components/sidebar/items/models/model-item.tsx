@@ -13,12 +13,16 @@ interface ModelItemProps {
 export const ModelItem: FC<ModelItemProps> = ({ model }) => {
   const [isTyping, setIsTyping] = useState(false)
 
-  const [apiKey, setApiKey] = useState(model.api_key)
-  const [baseUrl, setBaseUrl] = useState(model.base_url)
-  const [description, setDescription] = useState(model.description)
-  const [modelId, setModelId] = useState(model.model_id)
-  const [name, setName] = useState(model.name)
-  const [contextLength, setContextLength] = useState(model.context_length)
+  const [apiKey, setApiKey] = useState<string>(model.api_key ?? "")
+  const [baseUrl, setBaseUrl] = useState<string>(model.base_url ?? "")
+  const [description, setDescription] = useState<string>(
+    model.description ?? ""
+  )
+  const [modelId, setModelId] = useState<string>(model.model_id ?? "")
+  const [name, setName] = useState<string>(model.name ?? "")
+  const [contextLength, setContextLength] = useState<number>(
+    model.context_length ?? 0
+  )
 
   return (
     <SidebarItem

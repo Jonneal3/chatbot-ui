@@ -181,12 +181,13 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     const updatedItem = await updateFunction(item.id, {
       id: item.id,
       sharing: "private",
-      name: item.name, // replace with the actual property name
-      integration_id: item.integration_id, // replace with the actual property name
-      user_id: item.user_id, // replace with the actual property name
-      metadata: item.metadata, // replace with the actual property name
-      folder_id: folderId !== null ? folderId : undefined, // Ensure folderId is not null
-      context_length: item.context_length // Replace 10 with the actual value you want for context_length
+      name: item.name,
+      integration_id: item.integration_id,
+      user_id: item.user_id,
+      metadata: item.metadata,
+      folder_id: folderId !== null ? folderId : undefined,
+      context_length: item.context_length,
+      image: null // Add the image property with a default value, adjust as needed
     })
 
     setStateFunction((items: any) =>

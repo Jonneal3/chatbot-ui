@@ -81,20 +81,6 @@ export const CreateConnection: FC<CreateConnectionProps> = ({
 
     try {
       const result = await nango.auth(integration.id, connectionId)
-      console.log("Connection created:", result)
-
-      console.log("Connection data:")
-      console.log("id:", result.connectionId)
-      console.log("integration_id:", result.providerConfigKey)
-      console.log("user_id:", profile.user_id)
-      console.log("metadata:", {})
-      console.log(
-        "name:",
-        `${profile.display_name}'s ${result.providerConfigKey} Connection`
-      )
-      console.log("folder_id:", null) // or the actual folder ID if available
-      console.log("Selected workspace ID:", selectedWorkspace.id)
-      console.log("Profile user ID:", profile.user_id)
 
       const CreateConnection = await createConnection(
         {
@@ -104,7 +90,8 @@ export const CreateConnection: FC<CreateConnectionProps> = ({
           user_id: profile.user_id, // Provide the actual user ID here
           metadata: {}, // Provide any metadata if needed, otherwise use an empty object
           name: `${profile.display_name}'s ${result.providerConfigKey} Connection`, // Provide a name for the connection
-          folder_id: null // Provide the folder ID if available, otherwise omit or provide NULL
+          folder_id: null, // Provide the folder ID if available, otherwise omit or provide NULL
+          image: integration.image
         },
         selectedWorkspace.id, // Provide the actual workspace ID here
         profile.user_id // Provide the actual user ID here

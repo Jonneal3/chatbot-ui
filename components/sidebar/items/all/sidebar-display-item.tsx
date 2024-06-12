@@ -103,7 +103,11 @@ export const SidebarItem: FC<SidebarItemProps> = ({
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
-        {icon}
+        {typeof icon === "string" ? (
+          <img src={icon} alt="Icon" className="mr-3 size-6" />
+        ) : (
+          icon
+        )}
 
         <div className="ml-3 flex-1 truncate text-sm font-semibold">
           {item.name}

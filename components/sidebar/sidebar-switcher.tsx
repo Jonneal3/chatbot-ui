@@ -16,7 +16,6 @@ import { WithTooltip } from "../ui/with-tooltip"
 import { ProfileSettings } from "@/components/utility/profile-settings"
 import { SidebarSwitchItem } from "./sidebar-switch-item"
 import Account from "@/components/utility/billing"
-import logo from "@/public/icon-192x192.png"
 import { ChatbotUISVG } from "../icons/chatbotui-svg"
 
 export const SIDEBAR_ICON_SIZE = 20
