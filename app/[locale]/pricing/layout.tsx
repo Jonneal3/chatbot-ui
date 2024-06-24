@@ -1,6 +1,7 @@
 import { PropsWithChildren, Suspense } from "react"
 import { getURL } from "@/utils/helpers"
 import "@/styles/main.css"
+import { Metadata } from "next"
 
 const meta = {
   title: "Next.js Subscription Starter",

@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { runFunction } from "@/lib/run-message"
-// import getOauthObject from "@/lib/get-integration"
-// import fetch from "node-fetch"
 import { getProfileByUserId } from "@/db/profile"
 import { processUnitPrice } from "@/lib/unit-price"
 
@@ -33,12 +31,12 @@ export async function POST(request: Request) {
       )
     }
 
-    let body = await request.json()
+    const body = await request.json()
 
-    const profile = getProfileByUserId(body.user_id)
-    const user_id = (await profile).user_id
+    const profile = await getProfileByUserId(body.user_id)
+    const user_id = profile.user_id
 
-    const result = await processUnitPrice(user_id)
+    await processUnitPrice(user_id)
 
     // Check if all required parameters are present
     const requiredParams: string[] = ["assistant_id", "chat_id", "content"]
@@ -51,25 +49,18 @@ export async function POST(request: Request) {
       }
     }
 
-    const profile = getProfileByUserId(body.user_id)
-    const userId = (await profile).user_id
-
-    // Assuming these parameters are strings, you can annotate them accordingly
+    // Extract parameters with type annotation
     const {
-      chat_id,
       assistant_id,
+      chat_id,
       content
-    }: {
-      assistant_id: string
-      chat_id: string
-      content: string
-    } = body
+    }: { assistant_id: string; chat_id: string; content: string } = body
 
     // Using runFunction with inferred types
     const runMessage = await runFunction(
       assistant_id,
       chat_id,
-      user_id, // Use the retrieved user ID
+      user_id,
       content
     )
 
