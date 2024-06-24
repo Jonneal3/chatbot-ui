@@ -1,36 +1,31 @@
+// Import necessary modules
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { createClient, SupabaseClient } from "@supabase/supabase-js"
+import { createTool } from "@/db/tools" // Adjust the import based on the actual location of your db file
 
+// Define constants
 export const maxDuration = 299 // This function can run for a maximum of 5 seconds
 export const dynamic = "force-dynamic"
 
+// Define the POST function
 export async function POST(request: Request) {
   try {
+    // Retrieve user API key from the request headers
     const user_api_key =
       request.headers.get("Authorization")?.split(" ")[1] || ""
 
-    let supabase
+    // Initialize Supabase client if user API key exists
+    let supabase: SupabaseClient | null = null
     if (user_api_key) {
       supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-          global: {
-            headers: {
-              Authorization: user_api_key
-            }
-          },
-          auth: {
-            persistSession: false,
-            detectSessionInUrl: false,
-            autoRefreshToken: false
-          }
-        }
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
       )
     } else {
       return NextResponse.json({ error: "Missing API key" }, { status: 401 })
     }
 
+    // Parse request body as JSON
     const body = await request.json()
 
     // Check if all required parameters are present
@@ -69,19 +64,6 @@ export async function POST(request: Request) {
       connection_id,
       post_process,
       workspace_id
-    }: {
-      user_id: string
-      folder_id?: string
-      sharing?: string
-      description: string
-      name: string
-      schema: object
-      url?: string
-      custom_headers: object
-      request_in_body?: boolean
-      connection_id: string
-      post_process?: object
-      workspace_id: string
     } = body
 
     // Convert schema and custom_headers to properly formatted JSON strings
@@ -103,60 +85,13 @@ export async function POST(request: Request) {
       post_process: post_process ?? null
     }
 
-    // Insert the new tool into the tools table
-    const { data: toolData, error: toolError } = await supabase
-      .from("tools")
-      .insert([tool])
-      .select() // Ensure the data is returned by using select()
+    // Create the tool in the database
+    const createdTool = await createTool(tool, workspace_id)
 
-    if (toolError) {
-      throw toolError
-    }
-
-    // Check if toolData is null or empty
-    if (!toolData || toolData.length === 0) {
-      return NextResponse.json(
-        { error: "Failed to insert the tool" },
-        { status: 500 }
-      )
-    }
-
-    const tool_id = toolData[0].id
-
-    // Create the tool_workspaces object
-    const toolWorkspace = {
-      user_id,
-      tool_id,
-      workspace_id,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    }
-
-    // Insert the new tool_workspace into the tool_workspaces table
-    const { data: workspaceData, error: workspaceError } = await supabase
-      .from("tool_workspaces")
-      .insert([toolWorkspace])
-      .select()
-
-    if (workspaceError) {
-      throw workspaceError
-    }
-
-    // Check if workspaceData is null or empty
-    if (!workspaceData || workspaceData.length === 0) {
-      return NextResponse.json(
-        { error: "Failed to insert the tool_workspace" },
-        { status: 500 }
-      )
-    }
-
-    // Returning a response with the inserted tool and tool_workspace data
-    return NextResponse.json(
-      { tool: toolData[0], tool_workspace: workspaceData[0] },
-      { status: 201 }
-    )
+    // Returning a response with the inserted tool data
+    return NextResponse.json({ tool: createdTool }, { status: 201 })
   } catch (error: any) {
-    // Return the actual error message from Supabase
+    // Return the actual error message
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 }
