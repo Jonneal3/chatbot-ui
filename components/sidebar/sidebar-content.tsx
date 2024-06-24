@@ -18,8 +18,11 @@ export const SidebarContent: FC<SidebarContentProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("")
 
-  const filteredData: any = data.filter((item: { name: string }) =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredData: any = data.filter(
+    (item: { name?: string }) =>
+      item &&
+      item.name &&
+      item.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (

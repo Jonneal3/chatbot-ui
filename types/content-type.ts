@@ -8,3 +8,4 @@ export type ContentType =
   | "tools"
   | "models"
   | "connections"
+  | "teams"

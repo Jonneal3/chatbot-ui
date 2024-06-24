@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { runFunction } from "@/lib/run-message"
+// import getOauthObject from "@/lib/get-integration"
+// import fetch from "node-fetch"
 import { getProfileByUserId } from "@/db/profile"
+import { processUnitPrice } from "@/lib/unit-price"
+
 export const maxDuration = 299 // This function can run for a maximum of 5 seconds
 export const dynamic = "force-dynamic"
 
@@ -29,7 +33,12 @@ export async function POST(request: Request) {
       )
     }
 
-    const body = await request.json()
+    let body = await request.json()
+
+    const profile = getProfileByUserId(body.user_id)
+    const user_id = (await profile).user_id
+
+    const result = await processUnitPrice(user_id)
 
     // Check if all required parameters are present
     const requiredParams: string[] = ["assistant_id", "chat_id", "content"]
@@ -60,7 +69,7 @@ export async function POST(request: Request) {
     const runMessage = await runFunction(
       assistant_id,
       chat_id,
-      userId, // Use the retrieved user ID
+      user_id, // Use the retrieved user ID
       content
     )
 

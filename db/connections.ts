@@ -41,7 +41,7 @@ export const getConnectionWorkspacesByConnectionId = async (
   connectionId: string
 ) => {
   const { data: connection, error } = await supabase
-    .from("workspaces")
+    .from("connections")
     .select(
       `
       id, 

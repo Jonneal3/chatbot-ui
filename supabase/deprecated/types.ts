@@ -886,7 +886,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id: string
-          image?: string
+          image?: string | null
           name: string
         }
         Update: {
@@ -1019,7 +1019,7 @@ export type Database = {
         Row: {
           created_at: string
           model_id: string
-          updated_at: string 
+          updated_at: string | null
           user_id: string
           workspace_id: string
         }
@@ -1326,7 +1326,6 @@ export type Database = {
           created_at: string
           credits: number
           display_name: string
-          email: string | null
           google_gemini_api_key: string | null
           groq_api_key: string | null
           has_onboarded: boolean
@@ -1355,9 +1354,8 @@ export type Database = {
           azure_openai_endpoint?: string | null
           bio: string
           created_at?: string
-          credits?: number
+          credits: number
           display_name: string
-          email?: string | null
           google_gemini_api_key?: string | null
           groq_api_key?: string | null
           has_onboarded?: boolean
@@ -1388,7 +1386,6 @@ export type Database = {
           created_at?: string
           credits?: number
           display_name?: string
-          email?: string | null
           google_gemini_api_key?: string | null
           groq_api_key?: string | null
           has_onboarded?: boolean
@@ -1625,52 +1622,6 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      teams: {
-        Row: {
-          email: string | null
-          id: string
-          name: string 
-          user_id: string
-          workspace_id: string
-        }
-        Insert: {
-          email?: string | null
-          id?: string
-          name?: string 
-          user_id: string
-          workspace_id: string
-        }
-        Update: {
-          email?: string | null
-          id?: string
-          name?: string 
-          user_id?: string
-          workspace_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "teams_user_id_fkey1"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "teams_workspace_id_fkey"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "teams_workspace_id_fkey1"
-            columns: ["workspace_id"]
-            isOneToOne: false
-            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]

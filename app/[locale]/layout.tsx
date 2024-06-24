@@ -14,8 +14,8 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 const APP_NAME = "Samurai"
 const APP_DEFAULT_TITLE = "Samurai"
-const APP_TITLE_TEMPLATE = "%s - Samurai"
-const APP_DESCRIPTION = "Samurai PWA!"
+const APP_TITLE_TEMPLATE = "Samurai"
+const APP_DESCRIPTION = "Samurai"
 
 interface RootLayoutProps {
   children: ReactNode

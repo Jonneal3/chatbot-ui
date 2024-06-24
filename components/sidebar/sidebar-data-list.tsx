@@ -7,6 +7,7 @@ import { updateModel } from "@/db/models"
 import { updatePreset } from "@/db/presets"
 import { updatePrompt } from "@/db/prompts"
 import { updateTool } from "@/db/tools"
+import { updateTeam } from "@/db/teams"
 import { updateConnection } from "@/db/connections"
 import { cn } from "@/lib/utils"
 import { Tables } from "@/supabase/types"
@@ -22,6 +23,7 @@ import { ModelItem } from "./items/models/model-item"
 import { PresetItem } from "./items/presets/preset-item"
 import { PromptItem } from "./items/prompts/prompt-item"
 import { ToolItem } from "./items/tools/tool-item"
+import { TeamItem } from "./items/teams/team-item"
 import { ConnectionItem } from "./items/connections/connection-item"
 import { IconAlertCircle } from "@tabler/icons-react"
 
@@ -45,7 +47,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     setAssistants,
     setTools,
     setModels,
-    setConnections
+    setConnections,
+    setTeams
   } = useContext(ChatbotUIContext)
 
   const divRef = useRef<HTMLDivElement>(null)
@@ -100,6 +103,9 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
       case "models":
         return <ModelItem key={item.id} model={item as Tables<"models">} />
 
+      case "teams":
+        return <TeamItem key={item.id} team={item as Tables<"teams">} />
+
       default:
         return null
     }
@@ -153,7 +159,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     assistants: updateAssistant,
     tools: updateTool,
     models: updateModel,
-    connections: updateConnection
+    connections: updateConnection,
+    teams: updateTeam
   }
 
   const stateUpdateFunctions = {
@@ -165,7 +172,8 @@ export const SidebarDataList: FC<SidebarDataListProps> = ({
     assistants: setAssistants,
     tools: setTools,
     models: setModels,
-    connections: setConnections
+    connections: setConnections,
+    teams: setTeams
   }
 
   const updateFolder = async (itemId: string, folderId: string | null) => {

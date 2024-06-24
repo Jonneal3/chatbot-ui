@@ -89,7 +89,7 @@ export default function Pricing({ user, products, subscription }: Props) {
           <p className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
             No subscription pricing plans found. Create them in your{" "}
             <a
-              className="text-pink-500 underline"
+              className="text-white-500 underline"
               href="https://dashboard.stripe.com/products"
               rel="noopener noreferrer"
               target="_blank"
@@ -110,7 +110,7 @@ export default function Pricing({ user, products, subscription }: Props) {
               Pricing Plans
             </h1>
             <p className="m-auto mt-5 max-w-2xl text-xl text-zinc-200 sm:text-center sm:text-2xl">
-              Start building AI assistants free for 30 days.
+              Start building AI assistants free for 14 days.
             </p>
             <div className="relative mt-6 flex self-center rounded-lg border border-zinc-800 bg-zinc-900 p-0.5 sm:mt-8">
               {intervals.includes("month") && (
@@ -185,7 +185,7 @@ export default function Pricing({ user, products, subscription }: Props) {
                       type="button"
                       loading={priceIdLoading === price.id}
                       onClick={() => handleStripeCheckout(price)}
-                      className="mt-8 block w-full rounded-md bg-white py-2 text-center text-sm font-semibold text-zinc-900 hover:bg-zinc-400"
+                      className="mt-8 block w-full rounded-md bg-white py-2 text-center text-sm font-semibold text-black hover:bg-zinc-100"
                     >
                       {subscription ? "Subscribe" : "Subscribe"}
                     </Button>

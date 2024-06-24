@@ -1,16 +1,34 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { createMessage } from "@/db/messages"
-
-// Create a single Supabase client for interacting with your database
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+export const maxDuration = 299 // This function can run for a maximum of 5 seconds
+export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    const user_api_key =
+      request.headers.get("Authorization")?.split(" ")[1] || ""
+
+    if (user_api_key) {
+      const supabase = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: user_api_key
+            }
+          },
+          auth: {
+            persistSession: false,
+            detectSessionInUrl: false,
+            autoRefreshToken: false
+          }
+        }
+      )
+    }
+
+    let body = await request.json()
 
     // Check if all required parameters are present
     const requiredParams: string[] = [

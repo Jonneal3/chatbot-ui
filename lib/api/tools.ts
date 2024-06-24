@@ -7,10 +7,10 @@ import { Tables } from "@/supabase/types"
 import { ChatSettings } from "@/types"
 import OpenAI from "openai"
 import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions"
-import { createMessage } from "@/db/messages"
 import { UUID } from "crypto"
 import getOauthObject from "@/lib/get-integration"
 import runPostProcessingFile from "@/lib/post-process"
+import { processBodyContent } from "@/lib/dynamic-chat-vars"
 
 export async function tools(
   assistant_id: string,
@@ -83,6 +83,8 @@ export async function tools(
       })
     }
 
+    console.log("MESSAGES", messages)
+
     const firstResponse = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
       messages,
@@ -93,12 +95,18 @@ export async function tools(
     messages.push(message)
     const toolCalls = message.tool_calls || []
 
+    console.log("first_response_messages", firstResponse)
+
+    // if (toolCalls.length === 0) {
+    //   return new Response(message.content, {
+    //     headers: {
+    //       "Content-Type": "application/json"
+    //     }
+    //   })
+    // }
+
     if (toolCalls.length === 0) {
-      return new Response(message.content, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
+      return firstResponse
     }
 
     if (toolCalls.length > 0) {
@@ -121,7 +129,8 @@ export async function tools(
         if (schemaDetail && schemaDetail.post_process !== null) {
           const finalFunc = await runPostProcessingFile(
             parsedArgs,
-            schemaDetail
+            schemaDetail,
+            chat_id
           )
           console.log("Post-processing metadata found:", finalFunc)
           parsedArgs = finalFunc
@@ -205,8 +214,13 @@ export async function tools(
 
           const fullUrl = schemaDetail.url + path
 
-          const bodyContent = parsedArgs.requestBody || parsedArgs
-          console.log("body-content", bodyContent)
+          let bodyContent = parsedArgs.requestBody || parsedArgs
+
+          //UPDATE BODY CONTENT WITH DYNAMIC VARS
+          const processedBody = await processBodyContent(chat_id, bodyContent)
+          bodyContent = processedBody
+
+          console.log("body-content-final", processedBody)
 
           const requestInit = {
             method: "POST",
@@ -299,18 +313,17 @@ export async function tools(
             data = await response.json()
             console.log("Successful GET request, data received:", data)
           }
-
-          messages.push({
-            tool_call_id: toolCall.id,
-            role: "tool",
-            name: functionName,
-            content: JSON.stringify(data)
-          })
         }
+        messages.push({
+          tool_call_id: toolCall.id,
+          role: "tool",
+          name: functionName,
+          content: JSON.stringify(data)
+        })
       }
     }
 
-    console.log("messages", messages)
+    console.log("MESSAGES", messages)
 
     const secondResponse = await openai.chat.completions.create({
       model: chatSettings.model as ChatCompletionCreateParamsBase["model"],
@@ -319,20 +332,6 @@ export async function tools(
     })
 
     console.log("response2", secondResponse.choices[0].message.content)
-
-    const message2 = await createMessage({
-      chat_id: chat_id,
-      assistant_id: assistant_id,
-      user_id: user_id,
-      content: secondResponse.choices[0].message.content || "",
-      role: "assistant",
-      image_paths: [],
-      model: model,
-      sequence_number: 1
-    })
-
-    console.log(message2)
-
     return secondResponse
   } catch (error: any) {
     console.error(error)

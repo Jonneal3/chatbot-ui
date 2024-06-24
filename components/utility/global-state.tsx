@@ -52,6 +52,8 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   const [tools, setTools] = useState<Tables<"tools">[]>([])
   const [workspaces, setWorkspaces] = useState<Tables<"workspaces">[]>([])
   const [connections, setConnections] = useState<Tables<"connections">[]>([])
+  const [integrations, setIntegrations] = useState<Tables<"integrations">[]>([])
+  const [teams, setTeams] = useState<Tables<"teams">[]>([])
 
   // MODELS STORE
   const [envKeyMap, setEnvKeyMap] = useState<Record<string, VALID_ENV_KEYS>>({})
@@ -73,6 +75,13 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
   // CONNECTIONS STORE
   const [selectedConnection, setSelectedConnection] =
     useState<Tables<"connections"> | null>(null)
+
+  // TEAM STORE
+  const [selectedTeam, setSelectedTeam] = useState<Tables<"teams"> | null>(null)
+
+  // INTEGRATIONS STORE
+  const [selectedIntegration, setSelectedIntegration] =
+    useState<Tables<"integrations"> | null>(null)
 
   // ASSISTANT STORE
   const [selectedAssistant, setSelectedAssistant] =
@@ -234,6 +243,10 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         setWorkspaces,
         connections,
         setConnections,
+        integrations,
+        setIntegrations,
+        teams,
+        setTeams,
 
         // MODELS STORE
         envKeyMap,
@@ -258,6 +271,14 @@ export const GlobalState: FC<GlobalStateProps> = ({ children }) => {
         // CONNECTION STORE
         selectedConnection,
         setSelectedConnection,
+
+        // INTEGRATION STORE
+        selectedIntegration,
+        setSelectedIntegration,
+
+        // TEAM STORE
+        selectedTeam,
+        setSelectedTeam,
 
         // ASSISTANT STORE
         selectedAssistant,

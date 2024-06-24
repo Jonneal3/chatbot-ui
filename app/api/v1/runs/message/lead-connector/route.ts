@@ -2,8 +2,9 @@ import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { runFunction } from "@/lib/run-message"
 import getOauthObject from "@/lib/get-integration"
-import fetch from "node-fetch" // Import node-fetch for making API requests
-import { getProfileByUserId } from "@/db/profile"
+import fetch from "node-fetch"
+// import { getProfileByUserId } from "@/db/profile"
+import { processUnitPrice } from "@/lib/unit-price"
 export const maxDuration = 299 // This function can run for a maximum of 5 seconds
 export const dynamic = "force-dynamic"
 
@@ -36,8 +37,13 @@ export async function POST(request: Request) {
     // Extract customData from the body
     body = body.customData
 
-    const profile = getProfileByUserId(body.user_id)
-    const user_id = (await profile).user_id
+    // const profile = getProfileByUserId(body.user_id)
+    // const user_id = (await profile).user_id
+
+    console.log("LOGGING")
+
+    const user_id = body.user_id
+    const result = await processUnitPrice(user_id)
 
     // Check if all required parameters are present
     const requiredParams: string[] = [
@@ -75,6 +81,11 @@ export async function POST(request: Request) {
       contact_id: string // Add type for contact_id
     } = body
 
+    console.log("assist1", assistant_id)
+    console.log("assist2", chat_id)
+    console.log("assist3", user_id)
+    console.log("assist4", content)
+
     // Using runFunction with inferred types
     const runMessage = await runFunction(
       assistant_id,
@@ -89,6 +100,8 @@ export async function POST(request: Request) {
     const final_token = token.data.credentials.access_token
 
     console.log("FINAL TOKEN", final_token)
+
+    console.log("RUN-MESSAGE", runMessage)
 
     const messageContent = (runMessage as any)?.choices[0]?.message.content
 

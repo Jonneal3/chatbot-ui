@@ -130,6 +130,8 @@ export const createFile = async (
   formData.append("file_id", createdFile.id)
   formData.append("embeddingsProvider", embeddingsProvider)
 
+  console.log("FORM DATA", formData)
+
   const response = await fetch("/api/retrieval/process", {
     method: "POST",
     body: formData

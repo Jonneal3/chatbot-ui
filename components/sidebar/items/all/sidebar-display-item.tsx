@@ -65,7 +65,8 @@ export const SidebarItem: FC<SidebarItemProps> = ({
     },
     tools: async (item: any) => {},
     models: async (item: any) => {},
-    connections: async (item: any) => {}
+    connections: async (item: any) => {},
+    teams: async (item: any) => {}
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {

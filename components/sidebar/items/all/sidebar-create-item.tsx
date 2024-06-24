@@ -19,6 +19,7 @@ import { createFileBasedOnExtension } from "@/db/files"
 import { createModel } from "@/db/models"
 import { createPreset } from "@/db/presets"
 import { createConnection } from "@/db/connections"
+import { createTeam } from "@/db/teams"
 import { createPrompt } from "@/db/prompts"
 import {
   getAssistantImageFromStorage,
@@ -59,7 +60,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     setAssistantImages,
     setTools,
     setModels,
-    setConnections
+    setConnections,
+    setTeams
   } = useContext(ChatbotUIContext)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -174,7 +176,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
       return updatedAssistant
     },
     tools: createTool,
-    models: createModel
+    models: createModel,
+    teams: createTeam
   }
 
   const stateUpdateFunctions = {
@@ -186,7 +189,8 @@ export const SidebarCreateItem: FC<SidebarCreateItemProps> = ({
     assistants: setAssistants,
     tools: setTools,
     models: setModels,
-    connections: setConnections
+    connections: setConnections,
+    teams: setTeams // This sets the 'setTeams' function in the stateUpdateFunctions object
   }
 
   const { profile } = useContext(ChatbotUIContext)

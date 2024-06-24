@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase/browser-client"
 import { TablesInsert, TablesUpdate } from "@/supabase/types"
+import { getWorkspacesByTeamUserId } from "@/db/teams"
 
 export const getHomeWorkspaceByUserId = async (userId: string) => {
   const { data: homeWorkspace, error } = await supabase
@@ -29,19 +30,25 @@ export const getWorkspaceById = async (workspaceId: string) => {
 
   return workspace
 }
-
 export const getWorkspacesByUserId = async (userId: string) => {
-  const { data: workspaces, error } = await supabase
+  // Fetch workspaces directly associated with the user
+  const { data: userWorkspaces, error: userWorkspacesError } = await supabase
     .from("workspaces")
     .select("*")
     .eq("user_id", userId)
     .order("created_at", { ascending: false })
 
-  if (!workspaces) {
-    throw new Error(error.message)
+  if (userWorkspacesError) {
+    throw new Error(userWorkspacesError.message)
   }
 
-  return workspaces
+  // Fetch workspaces associated with teams
+  const teamWorkspaces = await getWorkspacesByTeamUserId(userId)
+
+  // Merge user workspaces and team workspaces
+  const allWorkspaces = userWorkspaces.concat(teamWorkspaces)
+
+  return allWorkspaces
 }
 
 export const createWorkspace = async (
