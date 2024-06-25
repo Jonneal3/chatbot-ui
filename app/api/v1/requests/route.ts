@@ -1,6 +1,6 @@
-// Import necessary modules
+// Import necessary moduless
 import { NextResponse } from "next/server"
-import { createClient, SupabaseClient } from "@supabase/supabase-js"
+import { createClient } from "@supabase/supabase-js"
 import { createTool } from "@/db/tools" // Adjust the import based on the actual location of your db file
 
 // Define constants
@@ -14,15 +14,24 @@ export async function POST(request: Request) {
     const user_api_key =
       request.headers.get("Authorization")?.split(" ")[1] || ""
 
-    // Initialize Supabase client if user API key exists
-    let supabase: SupabaseClient | null = null
+    // Create Supabase client if user API key exists
     if (user_api_key) {
-      supabase = createClient(
+      const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          global: {
+            headers: {
+              Authorization: user_api_key
+            }
+          },
+          auth: {
+            persistSession: false,
+            detectSessionInUrl: false,
+            autoRefreshToken: false
+          }
+        }
       )
-    } else {
-      return NextResponse.json({ error: "Missing API key" }, { status: 401 })
     }
 
     // Parse request body as JSON
