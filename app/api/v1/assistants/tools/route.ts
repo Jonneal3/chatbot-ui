@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
-import { createAssistant } from "@/db/assistants"
+import { createAssistantTool } from "@/db/assistant-tools"
 
 export const maxDuration = 299 // This function can run for a maximum of 5 seconds
 export const dynamic = "force-dynamic"
@@ -10,9 +10,8 @@ export async function POST(request: Request) {
     const user_api_key =
       request.headers.get("Authorization")?.split(" ")[1] || ""
 
-    let supabase
     if (user_api_key) {
-      supabase = createClient(
+      const supabase = createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
         {
@@ -69,26 +68,14 @@ export async function POST(request: Request) {
       updated_at: currentTimestamp // set updated_at to current timestamp
     }
 
-    // Insert the new record into the assistant_tools table
-    const { data, error } = await supabase
-      .from("assistant_tools")
-      .insert([assistantTool])
-      .select() // Ensure the data is returned by using select()
-
-    if (error) {
-      throw error
-    }
-
-    // Check if data is null or empty
-    if (!data || data.length === 0) {
-      return NextResponse.json(
-        { error: "Failed to insert the assistant tool" },
-        { status: 500 }
-      )
-    }
+    // Insert the new record using createAssistantTool
+    const createdAssistantTool = await createAssistantTool(assistantTool)
 
     // Returning a response with the inserted assistant tool data
-    return NextResponse.json({ assistant_tool: data[0] }, { status: 201 })
+    return NextResponse.json(
+      { assistant_tool: createdAssistantTool },
+      { status: 201 }
+    )
   } catch (error: any) {
     // Return the actual error message from Supabase
     return NextResponse.json(
